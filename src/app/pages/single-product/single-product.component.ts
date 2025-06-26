@@ -5,6 +5,7 @@ import { CartService } from '../../Services/cart.service';
 import { GlobalService } from '../../Services/global.service';
 import { Product } from '../../Interfaces/productInterface';
 import Swal from 'sweetalert2';
+import { WishlistService } from '../../Services/wishlist.service';
 
 @Component({
   selector: 'app-single-product',
@@ -26,13 +27,19 @@ export class SingleProductComponent implements OnInit {
     { value: '#0000ff', name: 'Blue' }
   ];
   selectedSize: string = '';
+  
+  // Animation flags
+  addingToCart: boolean = false;
+  addingToWishlist: boolean = false;
+  wishlistItems: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
     private cartService: CartService,
-    private globalService: GlobalService
+    private globalService: GlobalService,
+    private wishlistService: WishlistService
   ) {}
 
   ngOnInit() {
@@ -40,6 +47,7 @@ export class SingleProductComponent implements OnInit {
       this.productId = parseInt(params['id']);
       if (this.productId) {
         this.loadProduct();
+        this.loadWishlist(); // Make sure wishlist is loaded
       } else {
         this.router.navigate(['/404']);
       }
@@ -103,7 +111,9 @@ export class SingleProductComponent implements OnInit {
                 name: product.title,
                 price_after: parseFloat(discountedPrice.toFixed(2)),
                 price: parseFloat(product.price.toString()),
-                image: product.thumbnail
+                image: product.thumbnail,
+                addingToCart: false,
+                addingToWishlist: false
               };
             })
             .slice(0, 4);
@@ -137,87 +147,346 @@ export class SingleProductComponent implements OnInit {
   }
 
   addToCart() {
-    if (!this.product) {
-      Swal.fire({
-        title: 'Error!',
-        text: 'Product information is not available.',
-        icon: 'error',
-        timer: 2000,
-        showConfirmButton: false
-      });
-      return;
-    }
+    if (!this.product) return;
+    
+    this.addingToCart = true;
+    
+    const cartItem = {
+      product_id: this.product.id,
+      name: this.product.name || this.product.title,
+      price: this.product.price,
+      price_after: this.product.price_after,
+      image: this.product.image || this.product.thumbnail,
+      quantity: this.quantity,
+      size: this.selectedSize || '',
+      // Add any other necessary properties
+    };
+    
+    this.cartService.addToCart(cartItem).subscribe({
+      next: (res) => {
+        setTimeout(() => {
+          this.addingToCart = false;
+        }, 600);
+        
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: '#28a745',
+          color: 'white',
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
 
-    if (this.product.stock <= 0) {
-      Swal.fire({
-        title: 'Out of Stock!',
-        text: 'This product is currently out of stock.',
-        icon: 'warning',
-        timer: 2000,
-        showConfirmButton: false
-      });
-      return;
+        Toast.fire({
+          icon: 'success',
+          title: `${this.product?.name || 'Product'} added to cart!`
+        });
+      },
+      error: (err) => {
+        this.addingToCart = false;
+        Swal.fire({
+          title: 'Error!',
+          text: err.error?.message || 'Failed to add product to cart.',
+          icon: 'error',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+  
+  toggleWishlist() {
+    if (!this.product) return;
+    
+    const isInWishlist = this.isInWishlist(this.product.id);
+    
+    if (isInWishlist) {
+      this.removeFromWishlist();
+    } else {
+      this.addToWishlist();
     }
+  }
+  
+  addToWishlist() {
+    if (!this.product) return;
+    
+    this.addingToWishlist = true;
+    
+    const wishlistItem = {
+      product_id: this.product.id,
+      name: this.product.name || this.product.title,
+      price: this.product.price,
+      price_after: this.product.price_after,
+      image: this.product.image || this.product.thumbnail,
+      description: this.product.description,
+      category: this.product.category,
+      brand: this.product.brand
+    };
+    
+    this.wishlistService.addToWishlist(wishlistItem).subscribe({
+      next: (res) => {
+        setTimeout(() => {
+          this.addingToWishlist = false;
+        }, 600);
+        
+        this.loadWishlist();
+        
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: '#28a745',
+          color: 'white',
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
 
-    if (this.quantity > this.product.stock) {
-      Swal.fire({
-        title: 'Insufficient Stock!',
-        text: `Only ${this.product.stock} items available.`,
-        icon: 'warning',
-        timer: 2000,
-        showConfirmButton: false
-      });
-      return;
-    }
+        Toast.fire({
+          icon: 'success',
+          title: `${this.product?.name || 'Product'} added to wishlist! 💖`
+        });
+      },
+      error: (err) => {
+        this.addingToWishlist = false;
+        Swal.fire({
+          title: 'Error!',
+          text: err.error?.message || 'Failed to add product to wishlist.',
+          icon: 'error',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+  
+  removeFromWishlist() {
+    if (!this.product) return;
+    
+    const wishlistItem = this.wishlistItems.find(item => 
+      (item.product_id || item.id) === this.product?.id
+    );
 
-    if (this.globalService.isLoggedIn() || true) {
-      const cartItem = {
-        product_id: this.productId,
-        qty: this.quantity,
-        name: this.product.name || this.product.title,
-        price: this.product.price,
-        price_after: this.product.price_after,
-        image: this.main_image,
-        brand: this.product.brand,
-        stock: this.product.stock
-      };
-      
-      this.cartService.addToCart(cartItem).subscribe({
-        next: (res: any) => {
-          Swal.fire({
-            title: 'Success!',
-            text: `${this.product?.name} added to cart successfully.`,
-            icon: 'success',
+    if (wishlistItem) {
+      this.wishlistService.removeFromWishlist(wishlistItem.id || wishlistItem.wishlist_id).subscribe({
+        next: (res) => {
+          this.loadWishlist();
+
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
             timer: 2000,
-            showConfirmButton: false
+            timerProgressBar: true,
+            background: '#6c757d',
+            color: 'white'
+          });
+
+          Toast.fire({
+            icon: 'info',
+            title: `${this.product?.name || 'Product'} removed from wishlist`
           });
         },
-        error: (err: any) => {
-          Swal.fire({
-            title: 'Error!',
-            text: err.error?.message || 'Failed to add product to cart.',
-            icon: 'error',
-            timer: 2000,
-            showConfirmButton: false
-          });
+        error: (err) => {
+          console.error('Error removing from wishlist:', err);
         }
       });
+    }
+  }
+  
+  loadWishlist() {
+    this.wishlistService.getWishlist().subscribe({
+      next: (res) => {
+        this.wishlistItems = res.products || res.data || [];
+      },
+      error: (err) => {
+        console.error('Error loading wishlist:', err);
+      }
+    });
+  }
+  
+  isInWishlist(productId: number): boolean {
+    return this.wishlistItems.some(item => 
+      (item.product_id || item.id) === productId
+    );
+  }
+
+  // Handle image errors
+  handleImageError(event: Event): void {
+    const imgElement = event.target as HTMLImageElement;
+    imgElement.src = 'https://via.placeholder.com/300x300?text=No+Image';
+  }
+
+  // Add related product to cart
+  addRelatedToCart(product: Product) {
+    product.addingToCart = true;
+    
+    const cartItem = {
+      product_id: product.id,
+      name: product.name || product.title,
+      price: product.price,
+      price_after: product.price_after,
+      image: product.image || product.thumbnail,
+      quantity: 1,
+      size: '',
+    };
+    
+    this.cartService.addToCart(cartItem).subscribe({
+      next: (res) => {
+        setTimeout(() => {
+          product.addingToCart = false;
+        }, 600);
+        
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: '#28a745',
+          color: 'white',
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+
+        Toast.fire({
+          icon: 'success',
+          title: `${product.name || product.title} added to cart!`
+        });
+      },
+      error: (err) => {
+        product.addingToCart = false;
+        Swal.fire({
+          title: 'Error!',
+          text: err.error?.message || 'Failed to add product to cart.',
+          icon: 'error',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+
+  // Toggle wishlist for related product
+  toggleRelatedWishlist(product: Product) {
+    if (this.isInWishlist(product.id)) {
+      this.removeRelatedFromWishlist(product);
     } else {
-      this.router.navigate(['/login']);
+      this.addRelatedToWishlist(product);
     }
   }
 
-  getStockStatus(): string {
-    if (!this.product) return '';
-    if (this.product.stock <= 0) return 'Out of Stock';
-    if (this.product.stock <= 10) return 'Low Stock';
+  // Add related product to wishlist
+  addRelatedToWishlist(product: Product) {
+    product.addingToWishlist = true;
+    
+    const wishlistItem = {
+      product_id: product.id,
+      name: product.name || product.title,
+      price: product.price,
+      price_after: product.price_after,
+      image: product.image || product.thumbnail,
+      description: product.description,
+      category: product.category,
+      brand: product.brand
+    };
+    
+    this.wishlistService.addToWishlist(wishlistItem).subscribe({
+      next: (res) => {
+        setTimeout(() => {
+          product.addingToWishlist = false;
+        }, 600);
+        
+        this.loadWishlist();
+        
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: '#28a745',
+          color: 'white',
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+          }
+        });
+
+        Toast.fire({
+          icon: 'success',
+          title: `${product.name || product.title} added to wishlist! 💖`
+        });
+      },
+      error: (err) => {
+        product.addingToWishlist = false;
+        Swal.fire({
+          title: 'Error!',
+          text: err.error?.message || 'Failed to add product to wishlist.',
+          icon: 'error',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+  }
+
+  // Remove related product from wishlist
+  removeRelatedFromWishlist(product: Product) {
+    const wishlistItem = this.wishlistItems.find(item => 
+      (item.product_id || item.id) === product.id
+    );
+
+    if (wishlistItem) {
+      this.wishlistService.removeFromWishlist(wishlistItem.id || wishlistItem.wishlist_id).subscribe({
+        next: (res) => {
+          this.loadWishlist();
+
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            background: '#6c757d',
+            color: 'white'
+          });
+
+          Toast.fire({
+            icon: 'info',
+            title: `${product.name || product.title} removed from wishlist`
+          });
+        },
+        error: (err) => {
+          console.error('Error removing from wishlist:', err);
+        }
+      });
+    }
+  }
+
+  // Get stock status for a product
+  getStockStatus(product: Product): string {
+    if (!product) return '';
+    if (product.stock <= 0) return 'Out of Stock';
+    if (product.stock <= 10) return 'Low Stock';
     return 'In Stock';
   }
 
-  getStockStatusColor(): string {
-    if (!this.product) return '';
-    if (this.product.stock <= 0) return 'text-danger';
-    if (this.product.stock <= 10) return 'text-warning';
+  // Get stock status color for a product
+  getStockStatusColor(product: Product): string {
+    if (!product) return '';
+    if (product.stock <= 0) return 'text-danger';
+    if (product.stock <= 10) return 'text-warning';
     return 'text-success';
   }
 }

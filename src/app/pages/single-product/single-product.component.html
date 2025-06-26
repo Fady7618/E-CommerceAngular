@@ -44,7 +44,7 @@
             </div>
           </div>
           <div class="size-selection d-flex" style="gap: 20px;">
-            <h5>Size :</h5>
+            <h5 class="align-self-center">Size :</h5>
             <div class="d-flex" style="gap: 10px;">
               <button *ngFor="let size of sizes" 
                       class="size-button" 
@@ -55,15 +55,36 @@
             </div>
           </div>
         </div>
-        <div class="d-flex" style="gap: 20px; align-items: center;">
-          <div class="quantity d-flex">
+        <div class="d-flex align-items-center my-2" style="gap: 10px;">
+          <div class="quantity align-self-center mt-2 d-flex ">
             <button (click)="decreaseQuantity()">-</button>
             <input type="number" id="quantity" [(ngModel)]="quantity" min="1" readonly>
             <button (click)="increaseQuantity()">+</button>
           </div>
-          <button class="cart-btn" (click)="addToCart()">Buy Now</button>
-          <button class="size-button m-0 ms-3" style="padding: 10px;">
-            <i class="fa-regular fa-heart"></i>
+          <!-- Add to Cart button with stock check -->
+          <button 
+            class="btn btn-dark  action-btn "
+            (click)="addToCart()"
+            [disabled]="product?.stock <= 0">
+            <i class="fa-solid fa-cart-plus" 
+               [ngClass]="{'cart-icon-animated': addingToCart}"></i>
+            {{ product?.stock <= 0 ? 'Out of Stock' : null }}
+          </button>
+          <!-- Wishlist button -->
+          <button 
+            class="btn wishlist-btn action-btn" 
+            [ngClass]="{
+              'btn-danger in-wishlist': isInWishlist(product?.id || 0),
+              'btn-outline-danger': !isInWishlist(product?.id || 0)
+            }"
+            (click)="toggleWishlist()">
+            <i class="fa-heart" 
+               [ngClass]="{
+                 'heart-icon-animated': addingToWishlist,
+                 'fa-solid': isInWishlist(product?.id || 0), 
+                 'fa-regular': !isInWishlist(product?.id || 0)
+               }"></i>
+            
           </button>
         </div>
         <div class="delivery-info">
@@ -93,39 +114,95 @@
 
 <!-- Related Products Section -->
 <section *ngIf="related && related.length > 0">
-  <div class="mt-5 mb-5 d-flex">
-    <div class="related rounded"></div>
-    <h3 class="text-danger ms-4">Related Item</h3>
+  <div class="container my-3 d-flex">
+    <h3 class="text-danger">Related Items</h3>
+    <span class="ms-auto text-muted" *ngIf="!loading">{{ related.length }} products found</span>
   </div>
   <div class="row">
     <div class="col-lg-3 mb-3" *ngFor="let item of related">
-      <div class="card h-100">
+      <div class="card h-100 product-card">
         <div class="add-card position-relative">
           <div class="img">
-            <img src="{{ item.image }}" class="card-img-top position-relative border-bottom bg-body-secondary" alt="Product Image">
+            <img [src]="item.image" 
+                 class="card-img-top position-relative border-bottom bg-body-secondary" 
+                 alt="Product Image"
+                 (error)="handleImageError($event)">
           </div>
-          <div>
-            <i class="fa-regular fa-heart position-absolute top-0 end-0 mt-2 me-2 bg-white p-2 rounded-circle"></i>
-            <i class="fa-regular fa-eye position-absolute top-0 end-0 mt-5 me-2 bg-white p-2 rounded-circle"></i>
+          
+          <!-- Discount Badge -->
+          <div class="discount-badge" *ngIf="item.discountPercentage > 0">
+            -{{ item.discountPercentage.toFixed(0) }}%
           </div>
-          <button class="border-0 bg-dark text-white text-center p-3 position-absolute w-100 add-to-cart">
-            Add To Cart
+          
+          <!-- Stock Badge -->
+          <div class="stock-badge" [ngClass]="getStockStatusColor(item)">
+            {{ getStockStatus(item) }}
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <i class="fa-solid fa-cart-shopping cart-icon bg-white p-2 rounded-circle" 
+               (click)="addRelatedToCart(item)"
+               [class.adding]="item.addingToCart"
+               [class.disabled]="item.stock <= 0"
+               title="Add to Cart"></i>
+          </div>
+          <div class="action-buttons wishlist-btn">
+            <i class="fa-heart wishlist-icon bg-white p-2 rounded-circle" 
+               [class.fa-solid]="isInWishlist(item.id)"
+               [class.fa-regular]="!isInWishlist(item.id)"
+               [class.in-wishlist]="isInWishlist(item.id)"
+               [class.adding-to-wishlist]="item.addingToWishlist"
+               (click)="toggleRelatedWishlist(item)"
+               title="Add to Wishlist"></i>
+          </div>
+          
+          <!-- Add to Cart Button -->
+          <button class="border-0 bg-dark text-white text-center p-3 position-absolute w-100 add-to-cart-btn"
+                  (click)="addRelatedToCart(item)"
+                  [disabled]="item.stock <= 0">
+            <i class="fa-solid fa-cart-plus me-2" 
+               [ngClass]="{'cart-icon-animated': item.addingToCart}"></i>
+            {{ item.stock <= 0 ? 'Out of Stock' : 'Add To Cart' }}
           </button>
         </div>
-        <div class="card-body bg-white" style="z-index: 1;">
+        
+        <div class="card-body bg-white">
           <a routerLink="/product/single/{{ item.id }}">
             <p class="card-title">{{ item.name || item.title }}</p>
           </a>
-          <div>
-            <span class="text-danger me-2">${{ (item.price_after || 0).toFixed(2) }}</span>
-            <span class="text-light-emphasis text-decoration-line-through">${{ (item.price || 0).toFixed(2) }}</span>
+          
+          <!-- Brand -->
+          <div class="brand mb-2" *ngIf="item.brand">
+            <small class="text-muted">{{ item.brand }}</small>
           </div>
-          <div class="stars">
-            <i class="fa-solid fa-star text-warning"></i>
-            <i class="fa-solid fa-star text-warning"></i>
-            <i class="fa-solid fa-star text-warning"></i>
-            <i class="fa-solid fa-star text-warning"></i>
-            <i class="fa-solid fa-star text-warning"></i>
+          
+          <!-- Price Section -->
+          <div class="price-section">
+            <span class="text-danger me-2 current-price">${{ (item.price_after || 0).toFixed(2) }}</span>
+            <span class="text-light-emphasis text-decoration-line-through original-price" 
+                  *ngIf="item.discountPercentage > 0">${{ (item.price || 0).toFixed(2) }}</span>
+          </div>
+          
+          <!-- Rating Section -->
+          <div class="rating-section mt-2">
+            <div class="stars">
+              <i class="fa-solid fa-star" 
+                 [class.text-warning]="item.rating >= 1"
+                 [class.text-muted]="item.rating < 1"></i>
+              <i class="fa-solid fa-star" 
+                 [class.text-warning]="item.rating >= 2"
+                 [class.text-muted]="item.rating < 2"></i>
+              <i class="fa-solid fa-star" 
+                 [class.text-warning]="item.rating >= 3"
+                 [class.text-muted]="item.rating < 3"></i>
+              <i class="fa-solid fa-star" 
+                 [class.text-warning]="item.rating >= 4"
+                 [class.text-muted]="item.rating < 4"></i>
+              <i class="fa-solid fa-star" 
+                 [class.text-warning]="item.rating >= 5"
+                 [class.text-muted]="item.rating < 5"></i>
+            </div>
             <span class="text-light-emphasis ms-1">({{ item.rating?.count || 88 }})</span>
           </div>
         </div>
