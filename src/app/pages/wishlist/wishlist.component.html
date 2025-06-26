@@ -1,13 +1,3 @@
-<!-- <h2>Products</h2>
-<ul>
-  <li *ngFor="let product of products">
-    {{ product.name }} - ${{ product.price }}
-    <button *ngIf="!isInWishlist(product.id)" (click)="addToWishlist(product)">Add to Wishlist</button>
-    <span *ngIf="isInWishlist(product.id)">In Wishlist</span>
-  </li>
-</ul> -->
-
-
 <div class="mt-4"></div>
 <h6><span class="text-secondary">Home / </span>Wishlist</h6>
 
@@ -31,7 +21,7 @@
         </div>
       </div>
       <div class="card-body bg-white">
-        <a [routerLink]="'/product/single/' + (product.product_id || product.id)">
+        <a [routerLink]="'/product/single/' + (product.product_id || product.id)" class="text-decoration-none">
           <p class="card-title">{{ getProductName(product) }}</p>
         </a>
         <div>
