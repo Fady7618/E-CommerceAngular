@@ -1,7 +1,18 @@
 {
   "version": 2,
+  "public": true,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/e-commerce-angular/browser"
+      }
+    }
+  ],
   "routes": [
     { "handle": "filesystem" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
