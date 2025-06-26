@@ -32,3 +32,61 @@ i{
   border-radius: 50%;
   background-color: black;
 }
+
+/* Category Cards */
+.category-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e0e0e0;
+  min-height: 120px;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-color: #DB4444;
+}
+
+.category-link {
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.category-link:hover {
+  color: #DB4444;
+  text-decoration: none;
+}
+
+.category-icon {
+  color: #DB4444;
+  transition: transform 0.3s ease;
+}
+
+.category-card:hover .category-icon {
+  transform: scale(1.1);
+}
+
+.category-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .d-flex.justify-content-between {
+    flex-direction: column;
+  }
+  
+  .service-item {
+    margin: 15px 0;
+  }
+  
+  .category-card {
+    min-height: 100px;
+  }
+  
+  .category-name {
+    font-size: 0.9rem;
+  }
+}

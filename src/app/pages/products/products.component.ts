@@ -4,26 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CartService } from '../../Services/cart.service';
 import { WishlistService } from '../../Services/wishlist.service';
 import { GlobalService } from '../../Services/global.service';
+import { Product } from '../../Interfaces/productInterface';
 import Swal from 'sweetalert2';
-
-// Define interfaces for better type safety
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: string;
-  image: string;
-  rating: {
-    rate: number;
-    count: number;
-  };
-  // Additional properties for normalized product
-  name?: string;
-  price_after?: number;
-  addingToCart?: boolean;
-  addingToWishlist?: boolean;
-}
 
 @Component({
   selector: 'app-products',
@@ -35,6 +17,9 @@ export class ProductsComponent implements OnInit {
   categoryName: string = '';
   loading = false;
   wishlistItems: any[] = [];
+
+  // Default placeholder image
+  defaultImage = 'https://via.placeholder.com/300x300?text=No+Image';
 
   constructor(
     private productService: ProductService,
@@ -92,27 +77,45 @@ export class ProductsComponent implements OnInit {
   // Convert URL-friendly category names to API format
   convertCategoryName(categoryName: string): string {
     const categoryMap: { [key: string]: string } = {
-      'mens-clothing': "men's clothing",
-      'men-clothing': "men's clothing",
-      'mens-casual-premium-slim-fit-t-shirts': "men's clothing",
-      'womens-clothing': "women's clothing",
-      'women-clothing': "women's clothing",
-      'electronics': 'electronics',
-      'jewelery': 'jewelery',
-      'jewelry': 'jewelery'
+      'beauty': 'beauty',
+      'fragrances': 'fragrances',
+      'furniture': 'furniture',
+      'groceries': 'groceries',
+      'home-decoration': 'home-decoration',
+      'kitchen-accessories': 'kitchen-accessories',
+      'laptops': 'laptops',
+      'mens-shirts': 'mens-shirts',
+      'mens-shoes': 'mens-shoes',
+      'mens-watches': 'mens-watches',
+      'mobile-accessories': 'mobile-accessories',
+      'motorcycle': 'motorcycle',
+      'skin-care': 'skin-care',
+      'smartphones': 'smartphones',
+      'sports-accessories': 'sports-accessories',
+      'sunglasses': 'sunglasses',
+      'tablets': 'tablets',
+      'tops': 'tops',
+      'vehicle': 'vehicle',
+      'womens-bags': 'womens-bags',
+      'womens-dresses': 'womens-dresses',
+      'womens-jewellery': 'womens-jewellery',
+      'womens-shoes': 'womens-shoes',
+      'womens-watches': 'womens-watches'
     };
     
     return categoryMap[categoryName.toLowerCase()] || categoryName;
   }
 
-  // Normalize product data from FakeStore API
+  // Normalize product data from DummyJSON API
   normalizeProduct(product: Product): Product {
+    const discountedPrice = product.price * (1 - product.discountPercentage / 100);
+    
     return {
       ...product,
-      name: product.title || product.name || 'Product',
-      price_after: parseFloat(product.price.toString()), // Use the actual price as the discounted price
-      price: parseFloat((product.price * 1.2).toFixed(2)), // Create an original price (20% higher for display)
-      image: product.image
+      name: product.title,
+      price_after: parseFloat(discountedPrice.toFixed(2)), // Calculate discounted price
+      price: parseFloat(product.price.toString()), // Original price
+      image: product.thumbnail || product.images[0] || ''
     };
   }
 
@@ -136,10 +139,12 @@ export class ProductsComponent implements OnInit {
       const cartItem = {
         product_id: product.id,
         qty: 1,
-        name: product.name || product.title || 'Product',
-        price: product.price || 0,
-        price_after: product.price_after || product.price || 0,
-        image: product.image || ''
+        name: product.name || product.title,
+        price: product.price,
+        price_after: product.price_after || product.price,
+        image: product.image || product.thumbnail,
+        brand: product.brand,
+        stock: product.stock
       };
       
       console.log('Cart item structure:', cartItem);
@@ -202,19 +207,18 @@ export class ProductsComponent implements OnInit {
   addToWishlist(product: Product) {
     product.addingToWishlist = true;
     
-    console.log('Adding to wishlist - Full product object:', product);
-    
     const wishlistItem = {
       product_id: product.id,
       name: product.name || product.title,
       price: product.price,
-      price_after: product.price_after || product.price,
-      image: product.image,
+      price_after: product.price_after,
+      image: product.image || product.thumbnail,
       description: product.description,
-      category: product.category
+      category: product.category,
+      brand: product.brand,
+      rating: product.rating,
+      stock: product.stock
     };
-
-    console.log('Wishlist item structure:', wishlistItem);
 
     this.wishlistService.addToWishlist(wishlistItem).subscribe({
       next: (res) => {
@@ -292,5 +296,28 @@ export class ProductsComponent implements OnInit {
     return this.wishlistItems.some(item => 
       (item.product_id || item.id) === productId
     );
+  }
+
+  // Helper method to get stock status
+  getStockStatus(product: Product): string {
+    if (product.stock <= 0) return 'Out of Stock';
+    if (product.stock <= 10) return 'Low Stock';
+    return 'In Stock';
+  }
+
+  // Helper method to get stock status color
+  getStockStatusColor(product: Product): string {
+    if (product.stock <= 0) return 'text-danger';
+    if (product.stock <= 10) return 'text-warning';
+    return 'text-success';
+  }
+
+  // Image error handler with proper TypeScript typing
+  handleImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = this.defaultImage;
+      target.onerror = null; // Prevent infinite loop
+    }
   }
 }

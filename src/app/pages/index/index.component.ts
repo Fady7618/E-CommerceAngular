@@ -27,76 +27,102 @@ export class IndexComponent implements OnInit {
 
   loadCategories() {
     this.loading = true;
+    console.log('Starting to load categories...');
+    
     this.productService.getCategories().subscribe({
-      next: (categories: string[]) => {
-        console.log('Categories from API:', categories);
+      next: (categories: any[]) => {
+        console.log('Processed categories from API:', categories);
         
-        // Map FakeStore API categories to your desired format
-        this.bottomCategories = categories.map((category: string, index: number) => ({
-          category_data: {
-            category_name: this.formatCategoryName(category),
-            category_slug: this.createCategorySlug(category)
-          }
-        }));
+        if (Array.isArray(categories) && categories.length > 0) {
+          // Map the processed categories to your component's format
+          this.bottomCategories = categories
+            .slice(0, 8) // Limit to 8 categories for display
+            .map(category => ({
+              category_data: {
+                category_name: this.formatCategoryName(category.name),
+                category_slug: category.slug
+              }
+            }));
+          
+          console.log('Final formatted categories:', this.bottomCategories);
+        } else {
+          console.warn('No valid categories received, using fallback');
+          this.setFallbackCategories();
+        }
         
-        console.log('Formatted categories:', this.bottomCategories);
         this.loading = false;
       },
       error: (err) => {
         console.error('Error loading categories:', err);
-        // Fallback categories if API fails
-        this.bottomCategories = [
-          {
-            category_data: {
-              category_name: "Men's Clothing",
-              category_slug: "mens-clothing"
-            }
-          },
-          {
-            category_data: {
-              category_name: "Women's Clothing", 
-              category_slug: "womens-clothing"
-            }
-          },
-          {
-            category_data: {
-              category_name: "Electronics",
-              category_slug: "electronics"
-            }
-          },
-          {
-            category_data: {
-              category_name: "Jewelery",
-              category_slug: "jewelery"
-            }
-          }
-        ];
+        this.setFallbackCategories();
         this.loading = false;
       }
     });
   }
 
-  formatCategoryName(category: string): string {
-    // Convert API category names to display format
-    const nameMap: { [key: string]: string } = {
-      "men's clothing": "Men's Clothing",
-      "women's clothing": "Women's Clothing",
-      "electronics": "Electronics",
-      "jewelery": "Jewelery"
-    };
+  // Update format method to ensure it handles strings properly
+  formatCategoryName(categoryName: string): string {
+    if (!categoryName || typeof categoryName !== 'string') {
+      return 'Category';
+    }
     
-    return nameMap[category] || category.charAt(0).toUpperCase() + category.slice(1);
+    return categoryName
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
-  createCategorySlug(category: string): string {
-    // Convert API category names to URL-friendly slugs
-    const slugMap: { [key: string]: string } = {
-      "men's clothing": "mens-clothing",
-      "women's clothing": "womens-clothing", 
-      "electronics": "electronics",
-      "jewelery": "jewelery"
-    };
-    
-    return slugMap[category] || category.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  // Fallback categories if API fails
+  private setFallbackCategories(): void {
+    this.bottomCategories = [
+      {
+        category_data: {
+          category_name: "Beauty",
+          category_slug: "beauty"
+        }
+      },
+      {
+        category_data: {
+          category_name: "Fragrances", 
+          category_slug: "fragrances"
+        }
+      },
+      {
+        category_data: {
+          category_name: "Furniture",
+          category_slug: "furniture"
+        }
+      },
+      {
+        category_data: {
+          category_name: "Groceries",
+          category_slug: "groceries"
+        }
+      },
+      {
+        category_data: {
+          category_name: "Smartphones",
+          category_slug: "smartphones"
+        }
+      },
+      {
+        category_data: {
+          category_name: "Laptops",
+          category_slug: "laptops"
+        }
+      },
+      {
+        category_data: {
+          category_name: "Men's Shirts",
+          category_slug: "mens-shirts"
+        }
+      },
+      {
+        category_data: {
+          category_name: "Women's Dresses",
+          category_slug: "womens-dresses"
+        }
+      }
+    ];
   }
 }

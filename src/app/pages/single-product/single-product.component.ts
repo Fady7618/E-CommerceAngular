@@ -3,28 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../Services/product.service';
 import { CartService } from '../../Services/cart.service';
 import { GlobalService } from '../../Services/global.service';
+import { Product } from '../../Interfaces/productInterface';
 import Swal from 'sweetalert2';
-
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  category: string;
-  image: string;
-  rating: {
-    rate: number;
-    count: number;
-  };
-  // Additional properties for normalized product
-  name?: string;
-  price_after?: number;
-  detail?: {
-    name: string;
-    desc: string;
-  };
-  gallery?: Array<{ name: string }>;
-}
 
 @Component({
   selector: 'app-single-product',
@@ -72,22 +52,23 @@ export class SingleProductComponent implements OnInit {
       next: (product: Product) => {
         console.log('Raw product from API:', product);
         
-        // Normalize the product data for FakeStore API
+        // Calculate discounted price
+        const discountedPrice = product.price * (1 - product.discountPercentage / 100);
+        
+        // Normalize the product data for DummyJSON API
         this.product = {
           ...product,
           name: product.title,
-          price_after: parseFloat(product.price.toString()),
-          price: parseFloat((product.price * 1.2).toFixed(2)), // Create original price
+          price_after: parseFloat(discountedPrice.toFixed(2)),
+          price: parseFloat(product.price.toString()),
           detail: {
             name: product.title,
             desc: product.description
           },
-          gallery: [
-            { name: product.image }
-          ]
+          gallery: product.images?.map(img => ({ name: img })) || [{ name: product.thumbnail }]
         };
         
-        this.main_image = product.image;
+        this.main_image = product.thumbnail || product.images?.[0] || '';
         this.sizes = ['S', 'M', 'L', 'XL'];
         this.loading = false;
         this.loadRelatedProducts();
@@ -97,7 +78,6 @@ export class SingleProductComponent implements OnInit {
         console.error('Error loading product:', err);
         this.loading = false;
         
-        // Show error message
         Swal.fire({
           title: 'Product Not Found',
           text: 'The product you are looking for does not exist.',
@@ -116,13 +96,17 @@ export class SingleProductComponent implements OnInit {
         next: (res: any) => {
           this.related = (res.data || [])
             .filter((item: Product) => item.id !== this.productId)
-            .map((product: Product) => ({
-              ...product,
-              name: product.title,
-              price_after: parseFloat(product.price.toString()),
-              price: parseFloat((product.price * 1.2).toFixed(2))
-            }))
-            .slice(0, 4); // Show only 4 related products
+            .map((product: Product) => {
+              const discountedPrice = product.price * (1 - product.discountPercentage / 100);
+              return {
+                ...product,
+                name: product.title,
+                price_after: parseFloat(discountedPrice.toFixed(2)),
+                price: parseFloat(product.price.toString()),
+                image: product.thumbnail
+              };
+            })
+            .slice(0, 4);
         },
         error: (err: any) => {
           console.error('Error loading related products:', err);
@@ -137,7 +121,9 @@ export class SingleProductComponent implements OnInit {
   }
 
   increaseQuantity() {
-    this.quantity++;
+    if (this.product && this.quantity < this.product.stock) {
+      this.quantity++;
+    }
   }
 
   decreaseQuantity() {
@@ -162,25 +148,45 @@ export class SingleProductComponent implements OnInit {
       return;
     }
 
+    if (this.product.stock <= 0) {
+      Swal.fire({
+        title: 'Out of Stock!',
+        text: 'This product is currently out of stock.',
+        icon: 'warning',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      return;
+    }
+
+    if (this.quantity > this.product.stock) {
+      Swal.fire({
+        title: 'Insufficient Stock!',
+        text: `Only ${this.product.stock} items available.`,
+        icon: 'warning',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      return;
+    }
+
     if (this.globalService.isLoggedIn() || true) {
-      console.log('Single Product: Adding to cart, product:', this.product);
-      
       const cartItem = {
         product_id: this.productId,
         qty: this.quantity,
-        name: this.product.name || this.product.title || 'Product',
-        price: this.product.price || 0,
-        price_after: this.product.price_after || this.product.price || 0,
-        image: this.main_image || this.product.image || ''
+        name: this.product.name || this.product.title,
+        price: this.product.price,
+        price_after: this.product.price_after,
+        image: this.main_image,
+        brand: this.product.brand,
+        stock: this.product.stock
       };
-      
-      console.log('Single Product: Cart item structure:', cartItem);
       
       this.cartService.addToCart(cartItem).subscribe({
         next: (res: any) => {
           Swal.fire({
             title: 'Success!',
-            text: `${this.product?.name || 'Product'} added to cart successfully.`,
+            text: `${this.product?.name} added to cart successfully.`,
             icon: 'success',
             timer: 2000,
             showConfirmButton: false
@@ -199,5 +205,19 @@ export class SingleProductComponent implements OnInit {
     } else {
       this.router.navigate(['/login']);
     }
+  }
+
+  getStockStatus(): string {
+    if (!this.product) return '';
+    if (this.product.stock <= 0) return 'Out of Stock';
+    if (this.product.stock <= 10) return 'Low Stock';
+    return 'In Stock';
+  }
+
+  getStockStatusColor(): string {
+    if (!this.product) return '';
+    if (this.product.stock <= 0) return 'text-danger';
+    if (this.product.stock <= 10) return 'text-warning';
+    return 'text-success';
   }
 }

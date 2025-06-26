@@ -242,6 +242,72 @@
   animation: pulse 1s infinite;
 }
 
+/* Discount Badge */
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #dc3545;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 5;
+}
+
+/* Stock Badge */
+.stock-badge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: bold;
+  z-index: 5;
+}
+
+/* Brand styling */
+.brand {
+  font-style: italic;
+}
+
+/* Tags styling */
+.tags .badge {
+  font-size: 10px;
+  margin-bottom: 5px;
+}
+
+/* Disabled cart icon */
+.cart-icon.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cart-icon.disabled:hover {
+  background-color: white !important;
+  color: #6c757d !important;
+  transform: none !important;
+}
+
+/* Disabled add to cart button */
+.add-to-cart-btn:disabled {
+  background-color: #6c757d !important;
+  cursor: not-allowed;
+}
+
+.add-to-cart-btn:disabled:hover {
+  background-color: #6c757d !important;
+  transform: none;
+}
+
+/* Dynamic star ratings */
+.stars i.text-muted {
+  color: #e0e0e0 !important;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .action-buttons {
@@ -259,5 +325,15 @@
     bottom: 0;
     font-size: 14px;
     padding: 10px;
+  }
+
+  .discount-badge {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+  
+  .stock-badge {
+    font-size: 9px;
+    padding: 2px 6px;
   }
 }
