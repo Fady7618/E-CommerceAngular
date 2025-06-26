@@ -1,0 +1,91 @@
+<div class="row mt-5">
+  <div class="sidebar col-md-4">
+    <app-sidebar></app-sidebar>
+  </div>
+  <div class="info col-md-7 ps-5 pe-5 pt-3 pb-3 ">
+    <h4 class="text-danger mb-3">Edit Your Profile</h4>
+    <form #registerForm="ngForm" (ngSubmit)="handleSubmit(registerForm)">
+      <div class="row ">
+        <div class="col-md-6 mb-3">
+          <label for="" class="d-flex-column">First Name</label>
+          <input type="text" class="bg-body-tertiary border-0 form-control" name="firstName"
+            [(ngModel)]="model.first_name" required #firstName="ngModel"
+            [ngClass]="{'is-invalid': registerForm.submitted && firstName.invalid}">
+          <span class="text-danger" *ngIf="registerForm.submitted && firstName.invalid">
+            First Name is Required
+          </span>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="">Last Name</label>
+          <input type="text" class="bg-body-tertiary border-0 form-control" name="lastName"
+            [(ngModel)]="model.last_name" required #lastName="ngModel"
+            [ngClass]="{'is-invalid': registerForm.submitted && lastName.invalid}">
+          <span class="text-danger" *ngIf="registerForm.submitted && lastName.invalid">
+            Last Name is Required
+          </span>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="">Email</label>
+          <input type="email" class="bg-body-tertiary border-0 form-control" name="email"
+            [(ngModel)]="model.email" required email #email="ngModel"
+            [ngClass]="{'is-invalid': registerForm.submitted && email.invalid}">
+          <span class="text-danger" *ngIf="registerForm.submitted && email.invalid">
+            <span *ngIf="email.errors?.['required']">Email is Required</span>
+            <span *ngIf="email.errors?.['email']">Invalid Email Format</span>
+          </span>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="">Phone</label>
+          <input type="text" class="bg-body-tertiary border-0 form-control" name="phone"
+            [(ngModel)]="model.phone" required #phone="ngModel"
+            [ngClass]="{'is-invalid': registerForm.submitted && phone.invalid}">
+          <span class="text-danger" *ngIf="registerForm.submitted && phone.invalid">
+            Phone Number is Required
+          </span>
+        </div>
+      </div>
+      <div class="my-3">
+        <button class="btn">Save Changes</button>
+      </div>
+    </form>
+    <div class="row">
+      <h4 class="text-danger mt-2 mb-4">Change password</h4>
+      <form #passwordForm="ngForm" (ngSubmit)="handlePasswordChange(passwordForm)">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="">Old Password</label>
+            <input type="password" class="bg-body-tertiary border-0 form-control" name="currentPassword"
+              [(ngModel)]="passwordModel.current_password" required #currentPassword="ngModel"
+              [ngClass]="{'is-invalid': passwordForm.submitted && currentPassword.invalid}">
+            <span class="text-danger" *ngIf="passwordForm.submitted && currentPassword.invalid">
+              Current Password is Required
+            </span>
+          </div>
+          <div class="col-12 mb-3">
+            <label for="">New Password</label>
+            <input type="password" class="bg-body-tertiary border-0 form-control" name="newPassword"
+              [(ngModel)]="passwordModel.new_password" required #newPassword="ngModel"
+              [ngClass]="{'is-invalid': passwordForm.submitted && newPassword.invalid}">
+            <span class="text-danger" *ngIf="passwordForm.submitted && newPassword.invalid">
+              New Password is Required
+            </span>
+          </div>
+          <div class="col-12 mb-3">
+            <label for="">Confirm New Password</label>
+            <input type="password" class="bg-body-tertiary border-0 form-control" name="confirmPassword"
+              [(ngModel)]="passwordModel.confirm_password" required #confirmPassword="ngModel"
+              [ngClass]="{'is-invalid': passwordForm.submitted && confirmPassword.invalid}">
+            <span class="text-danger" *ngIf="passwordForm.submitted && confirmPassword.invalid">
+              Confirm Password is Required
+            </span>
+            <span class="text-danger" *ngIf="passwordModel.new_password !== passwordModel.confirm_password && passwordForm.submitted">
+              Passwords do not match
+            </span>
+          </div>
+        </div>
+        <div class="mt-1">
+          <button class="btn">Save Changes</button>
+        </div>
+      </form>
+  </div>
+</div>

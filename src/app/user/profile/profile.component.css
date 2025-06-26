@@ -1,0 +1,15 @@
+button {
+  background: #DB4444;
+  color: #fff;
+  padding: 15px 20px;
+  border-radius: 8px;
+}
+
+button:hover{
+  background: #db4444b9;
+  color: #fff;
+}
+
+.form-control{
+  border-radius: 5px;
+}

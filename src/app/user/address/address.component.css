@@ -1,0 +1,14 @@
+.card{
+  min-height: 230px;
+}
+
+.address{
+  min-height: 80vh;
+}
+
+
+.address-actions a {
+  text-decoration: none;
+  margin-inline-end: 10px;
+  cursor: pointer;
+}

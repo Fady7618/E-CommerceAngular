@@ -1,0 +1,263 @@
+.card-body a {
+  text-decoration: none;
+}
+
+.card-body a p {
+  color: #000;
+  transition: .3s;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.related {
+  width: 20px;
+  height: 40px;
+  background-color: #db4444;
+}
+
+.add-to-cart {
+  transition: all .5s;
+  bottom: -100px;
+}
+
+.card:hover .add-to-cart {
+  bottom: 0;
+}
+
+.product-card {
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.add-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.add-card .img {
+  height: 250px;
+  overflow: hidden;
+}
+
+.add-card .img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .img img {
+  transform: scale(1.05);
+}
+
+/* Action Buttons */
+.action-buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.wishlist-btn {
+  top: 60px;
+}
+
+.cart-icon,
+.wishlist-icon {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.product-card:hover .cart-icon,
+.product-card:hover .wishlist-icon {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.cart-icon:hover {
+  background-color: #db4444 !important;
+  color: white !important;
+  transform: scale(1.1);
+}
+
+.wishlist-icon:hover {
+  background-color: #ff69b4 !important;
+  color: white !important;
+  transform: scale(1.1);
+}
+
+/* Wishlist States */
+.wishlist-icon.in-wishlist {
+  background-color: #ff69b4 !important;
+  color: white !important;
+  opacity: 1;
+}
+
+.wishlist-icon.adding-to-wishlist {
+  animation: heartBeat 0.6s ease-in-out;
+}
+
+.cart-icon.adding {
+  animation: bounceIn 0.6s ease-in-out;
+}
+
+/* Add to Cart Button */
+.add-to-cart-btn {
+  transition: all 0.5s ease;
+  bottom: -60px;
+  left: 0;
+  border-radius: 0;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.product-card:hover .add-to-cart-btn {
+  bottom: 0;
+}
+
+.add-to-cart-btn:hover {
+  background-color: #db4444 !important;
+  transform: translateY(-2px);
+}
+
+/* Card Body */
+.card-body {
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.card-body a {
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.card-body a .card-title {
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+  line-height: 1.4;
+}
+
+.card-body a:hover .card-title {
+  color: #db4444;
+}
+
+/* Price Section */
+.price-section {
+  margin-bottom: 10px;
+}
+
+.current-price {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.original-price {
+  font-size: 16px;
+}
+
+/* Rating Section */
+.rating-section {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.stars i {
+  font-size: 14px;
+}
+
+/* Animations */
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.3);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.3);
+  }
+  70% {
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(219, 68, 68, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(219, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(219, 68, 68, 0);
+  }
+}
+
+/* Loading States */
+.adding-to-cart {
+  animation: pulse 1s infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .action-buttons {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .cart-icon,
+  .wishlist-icon {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .add-to-cart-btn {
+    bottom: 0;
+    font-size: 14px;
+    padding: 10px;
+  }
+}

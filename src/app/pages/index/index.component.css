@@ -1,0 +1,34 @@
+.carousel-item img {
+  height: 400px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.carousel-control-next,
+.carousel-control-prev {
+  display: none;
+}
+.carousel-indicators .active {
+  background-color: #DB4444 !important;
+}
+.card-body{
+  background-color: #DB4444;
+}
+.card-body a {
+  color: #000;
+  text-decoration: none;
+  transition: .3s;
+}
+.card-body:hover{
+  background-color: #db4444b7;
+}
+.card-body:hover a{
+  color: white;
+}
+i{
+  color: white;
+  font-size: 50px;
+  padding: 25px;
+  border-radius: 50%;
+  background-color: black;
+}

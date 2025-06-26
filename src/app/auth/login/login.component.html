@@ -1,0 +1,27 @@
+<div class="row justify-content-between mt-5 align-items-center">
+  <div class="col-lg-5 px-md-5 col-12 ">
+    <h2>Log in to Exclusive</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="handleSubmit()">
+      <div class="row"></div>
+      <input type="email" class="auth_input my-3" placeholder="Email" formControlName="email">
+      <span class="text-danger" *ngIf="isSubmitted && loginForm.controls['email'].invalid">
+        <span *ngIf="loginForm.controls['email'].errors?.['required']">Email is required</span>
+        <span *ngIf="loginForm.controls['email'].errors?.['email']">Invalid email format</span>
+      </span>
+      <input type="password" class="auth_input my-3" placeholder="Password" formControlName="password">
+      <span class="text-danger" *ngIf="isSubmitted && loginForm.controls['password'].invalid">
+        <span *ngIf="loginForm.controls['password'].errors?.['required']">Password is required</span>
+        <span *ngIf="loginForm.controls['password'].errors?.['minlength']">
+          Password must be at least 6 characters long
+        </span>
+      </span>
+      <br>
+      <button type="submit" class="btn btn-form mt-3">Log In</button>
+    </form>
+  </div>
+  <div class="col-lg-7">
+    <div class="img">
+      <img src="images/cart.png" alt="">
+    </div>
+  </div>
+</div>

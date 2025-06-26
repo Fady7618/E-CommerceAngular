@@ -1,0 +1,182 @@
+<div class="address">
+  <div class="row mt-5">
+    <div class="sidebar col-md-4">
+      <app-sidebar></app-sidebar>
+    </div>
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5>{{ isEditMode ? 'Edit' : 'Add New' }} Address</h5>
+        </div>
+        <div class="card-body">
+          <form #addressForm="ngForm" (ngSubmit)="handleSubmit(addressForm)">
+
+            <!-- Street Address -->
+            <div class="mb-3">
+              <label for="street_address" class="form-label">Street Address *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="street_address"
+                name="street_address"
+                [(ngModel)]="model.street_address"
+                required
+                placeholder="Enter your street address">
+            </div>
+
+            <!-- Country -->
+            <div class="mb-3">
+              <label for="country" class="form-label">Country *</label>
+              <select 
+                class="form-select" 
+                id="country"
+                name="country_name"
+                [(ngModel)]="model.country_name"
+                (change)="onCountryChange()"
+                required>
+                <option value="">Select Country</option>
+                <option *ngFor="let country of countries" [value]="country.name">
+                  {{ country.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- State/Governorate -->
+            <div class="mb-3">
+              <label for="state" class="form-label">State/Governorate *</label>
+              <select 
+                class="form-select" 
+                id="state"
+                name="state_name"
+                [(ngModel)]="model.state_name"
+                (change)="onStateChange()"
+                [disabled]="!model.country_name || states.length === 0"
+                required>
+                <option value="">Select State/Governorate</option>
+                <option *ngFor="let state of states" [value]="state.name">
+                  {{ state.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- City -->
+            <div class="mb-3">
+              <label for="city" class="form-label">City *</label>
+              <select 
+                class="form-select" 
+                id="city"
+                name="city_name"
+                [(ngModel)]="model.city_name"
+                [disabled]="!model.state_name || cities.length === 0"
+                required>
+                <option value="">Select City</option>
+                <option *ngFor="let city of cities" [value]="city.name">
+                  {{ city.name }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Building Number -->
+            <div class="mb-3">
+              <label for="building_number" class="form-label">Building Number</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="building_number"
+                name="building_number"
+                [(ngModel)]="model.building_number"
+                placeholder="Enter building number">
+            </div>
+
+            <!-- Floor Number -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="floor_number" class="form-label">Floor Number</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="floor_number"
+                  name="floor_number"
+                  [(ngModel)]="model.floor_number"
+                  placeholder="Enter floor number">
+              </div>
+
+              <!-- Flat Number -->
+              <div class="col-md-6 mb-3">
+                <label for="flat_number" class="form-label">Flat Number</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="flat_number"
+                  name="flat_number"
+                  [(ngModel)]="model.flat_number"
+                  placeholder="Enter flat number">
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-3">
+              <label for="phone" class="form-label">Phone</label>
+              <input 
+                type="tel" 
+                class="form-control" 
+                id="phone"
+                name="phone"
+                [(ngModel)]="model.phone"
+                placeholder="Enter phone number">
+            </div>
+
+            <!-- Postal Code -->
+            <div class="mb-3">
+              <label for="postal_code" class="form-label">Postal Code</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="postal_code"
+                name="postal_code"
+                [(ngModel)]="model.postal_code"
+                placeholder="Enter postal code">
+            </div>
+
+            <!-- Default Address -->
+            <div class="mb-3 form-check">
+              <input 
+                type="checkbox" 
+                class="form-check-input" 
+                id="is_default"
+                name="is_default"
+                [(ngModel)]="model.is_default">
+              <label class="form-check-label" for="is_default">
+                Set as default address
+              </label>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div *ngIf="loading" class="text-center mb-3">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="!addressForm.valid || loading">
+                {{ isEditMode ? 'Update' : 'Add' }} Address
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-secondary"
+                (click)="cancel()">
+                Cancel
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

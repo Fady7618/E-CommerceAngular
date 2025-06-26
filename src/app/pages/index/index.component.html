@@ -1,0 +1,86 @@
+<div class="container">
+  <div class="row my-5">
+    <div class="col-12">
+      <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+            aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+            aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+            aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="images/img1.jpg" class=" d-block w-100" alt="...">
+          </div>
+          <div class="carousel-item">
+            <img src="images/img2.jpg" class="d-block w-100" alt="...">
+          </div>
+          <div class="carousel-item">
+            <img src="images/img3.jpg" class="img-fluid d-block w-100" alt="...">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+          data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+          data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="my-4 d-flex flex-column">
+    <h2 class="text-danger ">Categories</h2>
+    <h3>Browse By Category</h3>
+  </div>
+
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-danger" role="status">
+      <span class="visually-hidden">Loading categories...</span>
+    </div>
+  </div>
+
+  <!-- Categories grid -->
+  <div class="row my-3" *ngIf="!loading">
+    <div class="col-lg-3 mb-3" *ngFor="let category of bottomCategories">
+      <div class="card rounded-0">
+        <div class="card-body text-center">
+          <a [routerLink]="'/category/' + category.category_data.category_slug" 
+            class="text-decoration-none">
+            <h5>{{ category.category_data.category_name }}</h5>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No categories fallback -->
+  <div *ngIf="!loading && bottomCategories.length === 0" class="text-center py-5">
+    <p class="text-muted">No categories available at the moment.</p>
+    <a routerLink="/products" class="btn btn-primary">View All Products</a>
+  </div>
+
+  <div class="d-flex justify-content-between my-3">
+    <div class="text-center">
+      <img src="images/Services.png" alt="" class="p-4">
+      <h4>FREE AND FAST DELIVERY</h4>
+      <p>Free delivery for all orders over $140</p>
+    </div>
+    <div class="text-center">
+      <img src="images/Services(1).png" alt="" class="p-4">
+      <h4>24/7 CUSTOMER SERVICE</h4>
+      <p>Friendly 24/7 customer support</p>
+    </div>
+    <div class="text-center">
+      <img src="images/Services(2).png" alt="" class="p-4">
+      <h4>MONEY BACK GUARANTEE</h4>
+      <p>We reurn money within 30 days</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+<div class="mt-4"></div>
+<h6><span class="text-secondary ">Home / </span>Cart</h6>
+
+<div *ngIf="products.length > 0; else emptyCart">
+  <table class="table cart-table mt-5">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Total</th>
+        <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="" *ngFor="let product of products">
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="img d-inline-block me-3">
+              <img [src]="getProductImage(product)" 
+                   alt="Product Image"
+                   [style.background-color]="'#f8f9fa'"
+                   [style.display]="'block'"
+                   (error)="handleImageError($event)">
+            </div>
+            <span>{{ product.details?.name || 'Product' }}</span>
+          </div>
+        </td>
+        <td>${{ (product.details?.price_after || product.details?.price || 0).toFixed(2) }}</td>
+        <td>
+          <div class="d-flex align-items-center">
+            <button class="btn btn-sm btn-outline-secondary me-2" 
+                    (click)="decreaseQuantity(product)">
+              -
+            </button>
+            <input type="number" 
+                   class="form-control form-control-quantity text-center mx-2" 
+                   [value]="product.qty" 
+                   style="width: 70px;"
+                   readonly>
+            <button class="btn btn-sm btn-outline-secondary ms-2" 
+                    (click)="increaseQuantity(product)">
+              +
+            </button>
+          </div>
+        </td>
+        <td>${{ (product.details?.total || (product.details?.price_after * product.qty) || 0).toFixed(2) }}</td>
+        <td class="text-danger">
+          <button class="btn btn-link text-danger p-1" 
+                  (click)="deleteCart(product.id || product.cart_id)">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="row">
+        <div class="col-lg-6">
+          <input type="text" class="form-control mb-2 py-2 rounded-1 border-dark" placeholder="Coupon Code">
+        </div>
+        <div class="col-lg-6">
+          <button class="btn btn-apply-coupon py-2 px-5 rounded-1">Apply Coupon</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card rounded-1 border-dark p-4">
+        <h5>Cart Total</h5>
+        <ul class="list-unstyled">
+          <li class="py-3 border-bottom border-dark">
+            Subtotal: <span>${{ getSubtotal().toFixed(2) }}</span>
+          </li>
+          <li class="py-3 border-bottom border-dark">
+            Shipping Fee: <span>Free</span>
+          </li>
+          <li class="py-3">
+            <strong>Total: <span>${{ getSubtotal().toFixed(2) }}</span></strong>
+          </li>
+        </ul>
+        <button class="btn btn-proceed w-100 py-2 px-5">Proceed to checkout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #emptyCart>
+  <div class="text-center mt-5 py-5">
+    <i class="fa-solid fa-shopping-cart fa-3x text-muted mb-3"></i>
+    <h4>Your cart is empty</h4>
+    <p class="text-muted">Add some products to your cart to see them here.</p>
+    <a routerLink="/products" class="btn btn-primary">Continue Shopping</a>
+  </div>
+</ng-template>

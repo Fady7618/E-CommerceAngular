@@ -1,0 +1,32 @@
+* {
+  font-family: "Poppins", sans-serif;
+}
+img {
+  width: 100%;
+}
+input {
+  width: 100%;
+  border: none;
+  outline: none;
+  border-bottom: 1px solid gray;
+  padding-block: 10px;
+  font-size: 20px;
+}
+input::placeholder{
+  transition: 0.2s;
+}
+input:focus::placeholder{
+  transition: 0.2s;
+  transform: translateX(2px);
+}
+button {
+  background: rgba(219, 68, 68, 1);
+  color: #fff;
+  padding: 16px 48px 16px 48px;
+  border-radius: 8px;
+}
+
+button:hover{
+  background: rgb(219, 96, 96);
+  color: #fff;
+}

@@ -1,0 +1,16 @@
+
+.address{
+  min-height: 80vh;
+}
+
+button {
+  background: rgba(219, 68, 68, 1);
+  color: #fff;
+  padding: 16px 48px 16px 48px;
+  border-radius: 4px;
+}
+
+button:hover{
+  background: rgb(219, 96, 96);
+  color: #fff;
+}

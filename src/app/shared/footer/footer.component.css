@@ -1,0 +1,51 @@
+footer {
+  background-color: black;
+  color: #fff;
+}
+input:focus::placeholder{
+  transform: translateX(3px);
+  transition: 0.2s;
+}
+input::placeholder{
+  color: darkgray;
+  transition: 0.2s;
+}
+img{
+  width: 100%;
+}
+a{
+  color: white;
+}
+i{
+  color: white;
+  background-clip: text;
+  transition: all 0.2s;
+}
+a:hover .fa-facebook-f{
+  color: transparent;
+  background: #1877F2;
+  -webkit-background-clip: text;
+  background-clip: text;
+  transition: 0.2s;
+}
+a:hover .fa-twitter{
+  color: transparent;
+  background: #1DA1F2;
+  -webkit-background-clip: text;
+  background-clip: text;
+  transition: 0.2s;
+}
+a:hover .fa-instagram{
+  color: transparent;
+  background: linear-gradient(#5b51d8,#c13584, #833ab4,#fd1d1d,#f77737,#fcaf45,#405de6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  transition: 0.2s;
+}
+a:hover .fa-linkedin{
+  color: transparent;
+  background: #0A63BC;
+  -webkit-background-clip: text;
+  background-clip: text;
+  transition: 0.2s;
+}

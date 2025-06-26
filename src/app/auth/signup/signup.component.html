@@ -1,0 +1,46 @@
+<div class="row justify-content-between my-5">
+  <div class="col-lg-7 d-flex align-items-center">
+    <div class="img">
+      <img src="images/cart.png" alt="">
+    </div>
+  </div>
+  <div class="col-lg-5 ps-md-5 col-12">
+    <h2>Create an account</h2>
+    <form #registerForm="ngForm" (ngSubmit)="handleSubmit(registerForm)">
+      <input type="text" class="auth_input my-3" placeholder="First Name" name="firstName" [(ngModel)]="model.first_name"
+        required #firstName="ngModel">
+      <span class="text-danger" *ngIf="registerForm.submitted && firstName.invalid">First Name is Required</span>
+      <input type="text" class="auth_input my-3" placeholder="Last Name" name="lastName" [(ngModel)]="model.last_name"
+        required #lastName="ngModel">
+      <span class="text-danger" *ngIf="registerForm.submitted && lastName.invalid">Last Name is Required</span>
+      <input type="email" class="auth_input my-3" placeholder="Email" name="email" [(ngModel)]="model.email" required email #email="ngModel">
+      <span class="text-danger" *ngIf="registerForm.submitted && email.invalid">
+        <span *ngIf="email.errors?.['required']">Email is Required</span>
+        <span *ngIf="email.errors?.['email']">Invalid Email Format</span>
+      </span>
+      <input type="text" class="auth_input my-3" placeholder="Phone Number" name="phone" [(ngModel)]="model.phone" required
+        #phone="ngModel">
+      <span class="text-danger" *ngIf="registerForm.submitted && phone.invalid">
+        <span *ngIf="phone.errors?.['required']">Phone Number is Required</span>
+      </span>
+      <input type="password" class="auth_input my-3" placeholder="Password" name="password" [(ngModel)]="model.password"
+        required minlength="6" #password="ngModel">
+      <span class="text-danger" *ngIf="registerForm.submitted && password.invalid">
+        <span *ngIf="password.errors?.['required']">Password is Required</span>
+        <span *ngIf="password.errors?.['minlength']">Password must be at least 6 characters</span>
+      </span>
+      <input type="password" class="auth_input my-3" placeholder="Re-enter Your Password" name="confirm_password"
+        [(ngModel)]="model.confirm_password" required [pattern]="model.password" #confirm_password="ngModel">
+      <span class="text-danger" *ngIf="registerForm.submitted && confirm_password.invalid">
+        <span *ngIf="confirm_password.errors?.['required']">Confirmation is Required</span>
+        <span *ngIf="confirm_password.errors?.['pattern']">Passwords do not match</span>
+      </span>
+      <button class="btn btn-form mt-3">Create Account</button>
+    </form>
+
+    <div class="d-flex mt-3" style="gap: 10px;">
+      <p>Already have account?</p>
+      <a routerLink="/login" class="text-black">Log in</a>
+    </div>
+  </div>
+</div>

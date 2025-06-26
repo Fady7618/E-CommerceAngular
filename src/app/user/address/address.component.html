@@ -1,0 +1,108 @@
+<div class="address">
+  <div class="row mt-5">
+    <div class="sidebar col-md-3">
+      <app-sidebar></app-sidebar>
+    </div>
+    <div class="col-lg-9">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>My Addresses</h4>
+        <button class="btn btn-primary" (click)="addNewAddress()">
+          <i class="fa-solid fa-plus me-2"></i>Add New Address
+        </button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- No Addresses -->
+      <div *ngIf="!loading && addresses.length === 0" class="text-center py-5">
+        <i class="fa-solid fa-map-location-dot fa-3x text-muted mb-3"></i>
+        <h5>No addresses found</h5>
+        <p class="text-muted">You haven't added any addresses yet.</p>
+        <button class="btn btn-primary" (click)="addNewAddress()">
+          Add Your First Address
+        </button>
+      </div>
+
+      <!-- Addresses Grid -->
+      <div class="row" *ngIf="!loading && addresses.length > 0">
+        <!-- Add New Address Card -->
+        <div class="col-lg-4 mb-3">
+          <div class="card h-100 d-flex align-items-center justify-content-center" 
+               style="cursor: pointer; border: 2px dashed #ddd;"
+               (click)="addNewAddress()">
+            <div class="text-center p-4">
+              <i class="fa-solid fa-plus fa-2x text-muted mb-2"></i>
+              <h6 class="text-muted">Add New Address</h6>
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Cards -->
+        <div class="col-lg-4 mb-3" *ngFor="let address of addresses">
+          <div class="card h-100">
+            <!-- Default Badge -->
+            <div class="card-header bg-success text-white" *ngIf="address.is_default">
+              <small><i class="fa-solid fa-check me-1"></i>Default Address</small>
+            </div>
+            
+            <!-- Address Details -->
+            <div class="card-body">
+              <h6 class="card-title">
+                <i class="fa-solid fa-location-dot me-2 text-danger"></i>
+                Address Details
+              </h6>
+              
+              <div class="address-details">
+                <p class="mb-2"><strong>{{ address.street_address }}</strong></p>
+                
+                <p class="mb-1" *ngIf="address.building_number">
+                  <small class="text-muted">Building:</small> {{ address.building_number }}
+                </p>
+                
+                <p class="mb-1" *ngIf="address.floor_number">
+                  <small class="text-muted">Floor:</small> {{ address.floor_number }}
+                </p>
+                
+                <p class="mb-1" *ngIf="address.flat_number">
+                  <small class="text-muted">Flat:</small> {{ address.flat_number }}
+                </p>
+                
+                <p class="mb-2">
+                  <i class="fa-solid fa-globe me-1"></i>
+                  {{ address.city_name }}, {{ address.state_name }}, {{ address.country_name }}
+                </p>
+                
+                <p class="mb-2" *ngIf="address.postal_code">
+                  <i class="fa-solid fa-mail-bulk me-1"></i>
+                  {{ address.postal_code }}
+                </p>
+                
+                <p class="mb-0" *ngIf="address.phone">
+                  <i class="fa-solid fa-phone me-1"></i>
+                  {{ address.phone }}
+                </p>
+              </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="card-footer bg-transparent">
+              <div class="d-flex justify-content-between">
+                <button class="btn btn-sm btn-outline-primary" (click)="editAddress(address.id)">
+                  <i class="fa-solid fa-edit me-1"></i>Edit
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteAddress(address.id)">
+                  <i class="fa-solid fa-trash me-1"></i>Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

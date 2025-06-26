@@ -1,0 +1,41 @@
+.img {
+  height: 200px;
+  overflow: hidden;
+}
+
+.img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card {
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.add-card .fa-solid {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-card .fa-solid:hover {
+  transform: scale(1.1);
+}
+
+.card-title {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.card-title:hover {
+  color: #dc3545;
+}
+
+.stars {
+  margin-top: 8px;
+}

@@ -1,0 +1,33 @@
+
+h4 {
+  margin-top: 20px;
+}
+
+ul {
+  margin-bottom: 20px;
+}
+
+ul li {
+  margin-inline-start: 40px;
+}
+
+ul li a.active{
+  color: #ff4d4f !important;
+}
+
+a {
+  text-decoration: none;
+}
+
+a.text-danger {
+  color: #ff4d4f;
+}
+
+a.text-muted {
+  color: #6c757d;
+}
+
+
+.link2{
+  color: rgba(33, 37, 41, 0.75);
+}

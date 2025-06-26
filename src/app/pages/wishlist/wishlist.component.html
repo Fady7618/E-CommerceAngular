@@ -1,0 +1,61 @@
+<!-- <h2>Products</h2>
+<ul>
+  <li *ngFor="let product of products">
+    {{ product.name }} - ${{ product.price }}
+    <button *ngIf="!isInWishlist(product.id)" (click)="addToWishlist(product)">Add to Wishlist</button>
+    <span *ngIf="isInWishlist(product.id)">In Wishlist</span>
+  </li>
+</ul> -->
+
+
+<div class="mt-4"></div>
+<h6><span class="text-secondary">Home / </span>Wishlist</h6>
+
+<div class="row mt-4" *ngIf="products.length > 0; else noWishlist">
+  <div class="col-lg-3 mb-3" *ngFor="let product of products">
+    <div class="card h-100">
+      <div class="add-card position-relative">
+        <div class="img">
+          <img [src]="getProductImage(product)" 
+               class="card-img-top position-relative border-bottom bg-body-secondary" 
+               alt="Product Image"
+               (error)="handleImageError($event)">
+        </div>
+        <div>
+          <i class="fa-solid fa-cart-shopping position-absolute top-0 end-0 mt-2 me-2 bg-white p-2 rounded-circle" 
+             (click)="addToCart(product)"></i>
+        </div>
+        <div>
+          <i class="fa-solid fa-heart position-absolute top-50 end-0 mt-2 me-2 bg-white p-2 rounded-circle text-danger" 
+             (click)="removeItem(product.id || product.wishlist_id)"></i>
+        </div>
+      </div>
+      <div class="card-body bg-white">
+        <a [routerLink]="'/product/single/' + (product.product_id || product.id)">
+          <p class="card-title">{{ getProductName(product) }}</p>
+        </a>
+        <div>
+          <span class="text-danger me-2">${{ getProductPriceAfter(product) }}</span>
+          <span class="text-light-emphasis text-decoration-line-through">${{ getProductPrice(product) }}</span>
+        </div>
+        <div class="stars mt-2">
+          <i class="fa-solid fa-star text-warning"></i>
+          <i class="fa-solid fa-star text-warning"></i>
+          <i class="fa-solid fa-star text-warning"></i>
+          <i class="fa-solid fa-star text-warning"></i>
+          <i class="fa-solid fa-star text-warning"></i>
+          <span class="text-light-emphasis ms-1">(88)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #noWishlist>
+  <div class="text-center mt-5 py-5">
+    <i class="fa-solid fa-heart fa-3x text-muted mb-3"></i>
+    <h4>Your wishlist is empty</h4>
+    <p class="text-muted">Add some products to your wishlist to see them here.</p>
+    <a routerLink="/products" class="btn btn-primary">Continue Shopping</a>
+  </div>
+</ng-template>

@@ -1,0 +1,173 @@
+@import '../../../../public/css/style.css';
+
+.product__details__pic__left::-webkit-scrollbar {
+  display: none;
+}
+
+input[name='color']{
+  display: none;
+}
+
+
+input[name='color']:checked + label {
+  border:2px solid black !important;
+}
+
+.product-options {
+  margin-block: 20px;
+}
+
+.color-selection {
+  margin-bottom: 10px;
+}
+
+.color-input{
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.size-selection {
+  margin-bottom: 10px;
+}
+
+.size-button {
+  border: 1px solid #ccc;
+  width: 50px;
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+  background-color: white;
+}
+
+.size-button.selected {
+  background-color: #e74c3c;
+  color: white;
+}
+
+#quantity {
+  width: 100px;
+  text-align: center;
+  padding: 10px;
+}
+
+.quantity button{
+  background-color: #e74c3c;
+  color: #fff;
+  border-style: solid;
+  border-color: #e74c3c;
+  outline: none;
+  padding: 10px;
+
+}
+
+.cart-btn{
+  background-color: #e74c3c;
+  color: #fff;
+  border-style: solid;
+  border-color: #e74c3c;
+  outline: none;
+  padding: 10px 50px;
+}
+
+.delivery-info {
+  border: 1px solid #ccc;
+  width: 75%;
+  max-width: 600px;
+  font-family: Arial, sans-serif;
+}
+
+.delivery-option {
+  display: flex;
+  align-items: flex-start;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.delivery-option:last-child {
+  border-bottom: none;
+}
+
+.icon {
+  margin-right: 15px;
+}
+
+.icon img {
+  width: 24px; /* Adjust the icon size */
+  height: 24px; /* Adjust the icon size */
+}
+
+.text h3 {
+  margin: 0 0 5px;
+  font-size: 18px;
+}
+
+.text p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.text a {
+  color: #007bff; /* Link color */
+  text-decoration: none;
+}
+
+.text a:hover {
+  text-decoration: underline;
+}
+
+.related{
+  width: 20px;
+  height: 40px;
+  background-color: #DB4444;
+
+}
+.w-card{
+  height: 40px;
+}
+
+.add-card .img{
+  height: 200px;
+
+}
+.add-card .img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+.img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: .5s;
+}
+
+
+.card-body a {
+  text-decoration: none;
+}
+
+.card-body a p{
+  color: #000;
+  transition: .3s;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.card-body a:hover p{
+  color: #DB4444;
+}
+
+
+.add-to-cart{
+  transition: all .5s;
+  bottom: -100px;
+}
+
+.card:hover .add-to-cart{
+  bottom: 0;
+}
