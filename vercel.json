@@ -6,7 +6,8 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist/e-commerce-angular/browser"
+        "distDir": "dist/e-commerce-angular/browser",
+        "outputDirectory": "dist/e-commerce-angular/browser"
       }
     }
   ],
