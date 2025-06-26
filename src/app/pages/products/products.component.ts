@@ -230,7 +230,7 @@ export class ProductsComponent implements OnInit {
           showConfirmButton: false,
           timer: 2000,
           timerProgressBar: true,
-          background: '#ff69b4',
+          background: '#28a745',
           color: 'white',
           didOpen: (toast) => {
             toast.addEventListener('mouseenter', Swal.stopTimer)

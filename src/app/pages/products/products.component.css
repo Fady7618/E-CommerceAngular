@@ -96,14 +96,14 @@
 }
 
 .wishlist-icon:hover {
-  background-color: #ff69b4 !important;
+  background-color: #db4444 !important;
   color: white !important;
   transform: scale(1.1);
 }
 
 /* Wishlist States */
 .wishlist-icon.in-wishlist {
-  background-color: #ff69b4 !important;
+  background-color: #db4444 !important;
   color: white !important;
   opacity: 1;
 }
