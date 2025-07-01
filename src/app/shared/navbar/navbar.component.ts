@@ -14,11 +14,12 @@ export class NavbarComponent {
   }
 
   logout(){
-    this.global.userName = '';
-    this.global.is_login = false;
     localStorage.removeItem('user_name');
     localStorage.removeItem('user_token');
     localStorage.removeItem('user');
+    
+    this.global.logout(); // Use the new method
+    
     Swal.fire({
       title: 'Success!',
       text: 'Logout Successfully.',
@@ -27,6 +28,6 @@ export class NavbarComponent {
       showConfirmButton: false
     }).then(() => {
       this.router.navigateByUrl('/');
-    });;
+    });
   }
 }

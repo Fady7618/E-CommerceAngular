@@ -18,19 +18,45 @@
         <span *ngIf="email.errors?.['required']">Email is Required</span>
         <span *ngIf="email.errors?.['email']">Invalid Email Format</span>
       </span>
-      <input type="text" class="auth_input my-3" placeholder="Phone Number" name="phone" [(ngModel)]="model.phone" required
+      <input 
+        type="text" 
+        class="auth_input my-3" 
+        placeholder="Phone Number (11 digits)" 
+        name="phone" 
+        [(ngModel)]="model.phone" 
+        required
+        pattern="[0-9]{11}"
+        maxlength="11"
+        (keypress)="validateNumberInput($event)"
         #phone="ngModel">
       <span class="text-danger" *ngIf="registerForm.submitted && phone.invalid">
         <span *ngIf="phone.errors?.['required']">Phone Number is Required</span>
+        <span *ngIf="phone.errors?.['pattern']">Phone Number must be exactly 11 digits</span>
       </span>
-      <input type="password" class="auth_input my-3" placeholder="Password" name="password" [(ngModel)]="model.password"
-        required minlength="6" #password="ngModel">
+      <input 
+        type="password" 
+        class="auth_input my-3" 
+        placeholder="Password" 
+        name="password" 
+        [(ngModel)]="model.password"
+        required 
+        minlength="8" 
+        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W]{8,}$"
+        #password="ngModel">
       <span class="text-danger" *ngIf="registerForm.submitted && password.invalid">
         <span *ngIf="password.errors?.['required']">Password is Required</span>
-        <span *ngIf="password.errors?.['minlength']">Password must be at least 6 characters</span>
+        <span *ngIf="password.errors?.['minlength']">Password must be at least 8 characters</span>
+        <span *ngIf="password.errors?.['pattern']">Password must contain at least one uppercase letter, one lowercase letter, and one number</span>
       </span>
-      <input type="password" class="auth_input my-3" placeholder="Re-enter Your Password" name="confirm_password"
-        [(ngModel)]="model.confirm_password" required [pattern]="model.password" #confirm_password="ngModel">
+      <input 
+        type="password" 
+        class="auth_input my-3" 
+        placeholder="Re-enter Your Password" 
+        name="confirm_password"
+        [(ngModel)]="model.confirm_password" 
+        required 
+        [pattern]="model.password" 
+        #confirm_password="ngModel">
       <span class="text-danger" *ngIf="registerForm.submitted && confirm_password.invalid">
         <span *ngIf="confirm_password.errors?.['required']">Confirmation is Required</span>
         <span *ngIf="confirm_password.errors?.['pattern']">Passwords do not match</span>

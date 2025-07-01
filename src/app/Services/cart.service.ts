@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 export class CartService {
   baseUrl = 'https://fakestoreapi.com/';
   private cart: any[] = [];
+  private _cartUpdateSubject = new Subject<boolean>();
 
   constructor(private Http: HttpClient) { 
     // Load cart from localStorage on service initialization
@@ -111,6 +112,7 @@ export class CartService {
   clearCart(): Observable<any> {
     this.cart = [];
     this.saveCart();
+    this._cartUpdateSubject.next(true); // Notify subscribers that cart has changed
     return of({ message: 'Cart cleared successfully' });
   }
 

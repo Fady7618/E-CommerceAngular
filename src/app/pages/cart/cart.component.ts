@@ -123,4 +123,45 @@ export class CartComponent implements OnInit {
     event.target.src = this.defaultImage;
     event.target.onerror = null; // Prevent infinite loop
   }
+
+  clearAllCart() {
+    // Show confirmation dialog
+    Swal.fire({
+      title: 'Clear entire cart?',
+      text: 'Are you sure you want to remove all items from your cart?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, clear it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.cart.clearCart().subscribe({
+          next: (res) => {
+            // Refresh the cart
+            this.getCart();
+            
+            // Show success message
+            Swal.fire({
+              title: 'Cart Cleared!',
+              text: 'Your shopping cart has been emptied.',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            });
+          },
+          error: (err) => {
+            console.error('Error clearing cart:', err);
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to clear your cart.',
+              icon: 'error',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          }
+        });
+      }
+    });
+  }
 }

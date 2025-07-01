@@ -87,4 +87,22 @@ export class ProfileComponent {
       );
     }
   }
+
+  validateNumberInput(event: any): boolean {
+    const pattern = /^[0-9]$/;
+    const inputChar = String.fromCharCode(event.charCode);
+    
+    // Allow special keys like backspace, delete, arrows, etc.
+    if (event.charCode === 0) {
+      return true;
+    }
+    
+    // Only allow digit characters
+    if (!pattern.test(inputChar)) {
+      event.preventDefault();
+      return false;
+    }
+    
+    return true;
+  }
 }

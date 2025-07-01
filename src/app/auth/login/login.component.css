@@ -30,3 +30,12 @@ button:hover{
   background: rgb(219, 96, 96);
   color: #fff;
 }
+.validation-messages {
+  font-size: 0.85rem;
+  margin-top: -5px;
+  margin-bottom: 10px;
+}
+
+.is-invalid {
+  border-bottom: 1px solid #dc3545 !important;
+}

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { GlobalService } from './global.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,14 +11,40 @@ export class WishlistService {
   private wishlist: any[] = [];
   private wishlistSubject = new BehaviorSubject<any[]>([]);
   public wishlist$ = this.wishlistSubject.asObservable();
+  private authSubscription: any;
 
-  constructor(private Http: HttpClient) { 
+  constructor(
+    private Http: HttpClient,
+    private globalService: GlobalService
+  ) { 
     // Load wishlist from localStorage on service initialization
-    const savedWishlist = localStorage.getItem('wishlist_items');
-    if (savedWishlist) {
-      this.wishlist = JSON.parse(savedWishlist);
-      this.wishlistSubject.next(this.wishlist);
+    this.loadWishlistFromStorage();
+    
+    // Subscribe to auth state changes
+    this.authSubscription = this.globalService.loginState$.subscribe(isLoggedIn => {
+      if (!isLoggedIn) {
+        // Clear wishlist when user logs out
+        this.clearWishlistData();
+      } else {
+        // Reload wishlist when user logs in
+        this.loadWishlistFromStorage();
+      }
+    });
+  }
+  
+  private loadWishlistFromStorage() {
+    if (this.globalService.is_login) {
+      const savedWishlist = localStorage.getItem('wishlist_items');
+      if (savedWishlist) {
+        this.wishlist = JSON.parse(savedWishlist);
+        this.wishlistSubject.next(this.wishlist);
+      }
     }
+  }
+  
+  private clearWishlistData() {
+    this.wishlist = [];
+    this.wishlistSubject.next(this.wishlist);
   }
 
   private saveWishlist() {

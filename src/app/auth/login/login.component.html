@@ -1,21 +1,47 @@
 <div class="row justify-content-between mt-5 align-items-center">
-  <div class="col-lg-5 px-md-5 col-12 ">
+  <div class="col-lg-5 px-md-5 col-12">
     <h2>Log in to Exclusive</h2>
     <form [formGroup]="loginForm" (ngSubmit)="handleSubmit()">
-      <div class="row"></div>
-      <input type="email" class="auth_input my-3" placeholder="Email" formControlName="email">
-      <span class="text-danger" *ngIf="isSubmitted && loginForm.controls['email'].invalid">
-        <span *ngIf="loginForm.controls['email'].errors?.['required']">Email is required</span>
-        <span *ngIf="loginForm.controls['email'].errors?.['email']">Invalid email format</span>
-      </span>
-      <input type="password" class="auth_input my-3" placeholder="Password" formControlName="password">
-      <span class="text-danger" *ngIf="isSubmitted && loginForm.controls['password'].invalid">
-        <span *ngIf="loginForm.controls['password'].errors?.['required']">Password is required</span>
-        <span *ngIf="loginForm.controls['password'].errors?.['minlength']">
-          Password must be at least 6 characters long
-        </span>
-      </span>
-      <br>
+      <!-- Email field -->
+      <div class="form-group position-relative">
+        <input 
+          type="email" 
+          class="auth_input my-3" 
+          placeholder="Email" 
+          formControlName="email"
+          [ngClass]="{'is-invalid': isSubmitted && loginForm.controls['email'].invalid}">
+        <div class="text-danger validation-messages" *ngIf="isSubmitted && loginForm.controls['email'].invalid">
+          <div *ngIf="loginForm.controls['email'].errors?.['required']">
+            Email is required
+          </div>
+          <div *ngIf="loginForm.controls['email'].errors?.['email'] || loginForm.controls['email'].errors?.['pattern']">
+            Please enter a valid email address
+          </div>
+        </div>
+      </div>
+
+      <!-- Password field without toggle button -->
+      <div class="form-group position-relative">
+        <input 
+          type="password"
+          class="auth_input my-3" 
+          placeholder="Password" 
+          formControlName="password"
+          [ngClass]="{'is-invalid': isSubmitted && loginForm.controls['password'].invalid}">
+        <div class="text-danger validation-messages" *ngIf="isSubmitted && loginForm.controls['password'].invalid">
+          <div *ngIf="loginForm.controls['password'].errors?.['required']">
+            Password is required
+          </div>
+          <div *ngIf="loginForm.controls['password'].errors?.['minlength']">
+            Password must be at least 8 characters long
+          </div>
+          <div *ngIf="loginForm.controls['password'].errors?.['pattern']">
+            Password must contain at least one uppercase letter, one lowercase letter, and one number
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit button -->
       <button type="submit" class="btn btn-form mt-3">Log In</button>
     </form>
   </div>

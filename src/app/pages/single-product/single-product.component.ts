@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../Services/product.service';
 import { CartService } from '../../Services/cart.service';
@@ -6,13 +6,14 @@ import { GlobalService } from '../../Services/global.service';
 import { Product } from '../../Interfaces/productInterface';
 import Swal from 'sweetalert2';
 import { WishlistService } from '../../Services/wishlist.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-single-product',
   templateUrl: './single-product.component.html',
   styleUrls: ['./single-product.component.css']
 })
-export class SingleProductComponent implements OnInit {
+export class SingleProductComponent implements OnInit, OnDestroy {
   product: Product | null = null;
   related: Product[] = [];
   main_image: string = '';
@@ -32,6 +33,12 @@ export class SingleProductComponent implements OnInit {
   addingToCart: boolean = false;
   addingToWishlist: boolean = false;
   wishlistItems: any[] = [];
+  
+  // Authentication subscription
+  private authSubscription: Subscription;
+
+  // Add a property to track cart items
+  cartItems: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -40,18 +47,46 @@ export class SingleProductComponent implements OnInit {
     private cartService: CartService,
     private globalService: GlobalService,
     private wishlistService: WishlistService
-  ) {}
+  ) {
+    // Subscribe to authentication state changes
+    this.authSubscription = this.globalService.loginState$.subscribe(isLoggedIn => {
+      if (!isLoggedIn) {
+        // Clear wishlist items when user logs out
+        this.wishlistItems = [];
+        this.cartItems = []; // Clear cart items too
+      } else {
+        // Reload wishlist and cart when user logs in
+        this.loadWishlist();
+        this.loadCart(); // Load cart when user logs in
+      }
+    });
+  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.productId = parseInt(params['id']);
       if (this.productId) {
         this.loadProduct();
-        this.loadWishlist(); // Make sure wishlist is loaded
+        
+        // Only load wishlist and cart if user is logged in
+        if (this.globalService.is_login) {
+          this.loadWishlist();
+          this.loadCart(); // Add this to load cart data
+        } else {
+          this.wishlistItems = []; 
+          this.cartItems = []; // Clear cart items when not logged in
+        }
       } else {
         this.router.navigate(['/404']);
       }
     });
+  }
+
+  ngOnDestroy() {
+    // Clean up subscription to prevent memory leaks
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
   }
 
   loadProduct() {
@@ -147,6 +182,29 @@ export class SingleProductComponent implements OnInit {
   }
 
   addToCart() {
+    if (!this.globalService.is_login) {
+      // User is not logged in, show alert
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please login or create an account to add items to your cart',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Sign Up',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#28a745'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Navigate to login page
+          this.router.navigate(['/login']);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          // Navigate to signup page
+          this.router.navigate(['/signup']);
+        }
+      });
+      return;
+    }
+    
     if (!this.product) return;
     
     this.addingToCart = true;
@@ -157,9 +215,8 @@ export class SingleProductComponent implements OnInit {
       price: this.product.price,
       price_after: this.product.price_after,
       image: this.product.image || this.product.thumbnail,
-      quantity: this.quantity,
+      qty: this.quantity,
       size: this.selectedSize || '',
-      // Add any other necessary properties
     };
     
     this.cartService.addToCart(cartItem).subscribe({
@@ -167,6 +224,8 @@ export class SingleProductComponent implements OnInit {
         setTimeout(() => {
           this.addingToCart = false;
         }, 600);
+
+        this.loadCart();
         
         const Toast = Swal.mixin({
           toast: true,
@@ -201,6 +260,29 @@ export class SingleProductComponent implements OnInit {
   }
   
   toggleWishlist() {
+    if (!this.globalService.is_login) {
+      // User is not logged in, show alert
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please login or create an account to add items to your wishlist',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Sign Up',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#28a745'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Navigate to login page
+          this.router.navigate(['/login']);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          // Navigate to signup page
+          this.router.navigate(['/signup']);
+        }
+      });
+      return;
+    }
+    
     if (!this.product) return;
     
     const isInWishlist = this.isInWishlist(this.product.id);
@@ -312,7 +394,29 @@ export class SingleProductComponent implements OnInit {
       }
     });
   }
-  
+
+  // Add this method to the SingleProductComponent class
+  isInCart(productId: number): boolean {
+    // Check if the product exists in cart items
+    if (!productId || !this.cartItems || !this.cartItems.length) return false;
+    
+    return this.cartItems.some(item => 
+      (item.product_id === productId) || (item.id === productId)
+    );
+  }
+
+  // Update the loadCart method to fetch cart items
+  loadCart() {
+    this.cartService.getCart().subscribe({
+      next: (res) => {
+        this.cartItems = res.products || [];
+      },
+      error: (err) => {
+        console.error('Error loading cart:', err);
+      }
+    });
+  }
+
   isInWishlist(productId: number): boolean {
     return this.wishlistItems.some(item => 
       (item.product_id || item.id) === productId
@@ -327,6 +431,29 @@ export class SingleProductComponent implements OnInit {
 
   // Add related product to cart
   addRelatedToCart(product: Product) {
+    if (!this.globalService.is_login) {
+      // User is not logged in, show alert
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please login or create an account to add items to your cart',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Sign Up',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#28a745'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Navigate to login page
+          this.router.navigate(['/login']);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          // Navigate to signup page
+          this.router.navigate(['/signup']);
+        }
+      });
+      return;
+    }
+    
     product.addingToCart = true;
     
     const cartItem = {
@@ -335,7 +462,7 @@ export class SingleProductComponent implements OnInit {
       price: product.price,
       price_after: product.price_after,
       image: product.image || product.thumbnail,
-      quantity: 1,
+      qty: 1,
       size: '',
     };
     
@@ -379,6 +506,29 @@ export class SingleProductComponent implements OnInit {
 
   // Toggle wishlist for related product
   toggleRelatedWishlist(product: Product) {
+    if (!this.globalService.is_login) {
+      // User is not logged in, show alert
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please login or create an account to add items to your wishlist',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Sign Up',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#28a745'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Navigate to login page
+          this.router.navigate(['/login']);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          // Navigate to signup page
+          this.router.navigate(['/signup']);
+        }
+      });
+      return;
+    }
+    
     if (this.isInWishlist(product.id)) {
       this.removeRelatedFromWishlist(product);
     } else {

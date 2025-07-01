@@ -63,12 +63,15 @@
           </div>
           <!-- Add to Cart button with stock check -->
           <button 
-            class="btn btn-dark  action-btn "
+            class="btn action-btn" 
+            [ngClass]="{
+              'btn-dark in-cart': isInCart(product?.id || 0),
+              'btn-outline-dark': !isInCart(product?.id || 0)
+            }"
             (click)="addToCart()"
             [disabled]="product?.stock <= 0">
-            <i class="fa-solid fa-cart-plus" 
-               [ngClass]="{'cart-icon-animated': addingToCart}"></i>
-            {{ product?.stock <= 0 ? 'Out of Stock' : null }}
+            <i class="fa-solid fa-bag-shopping"></i>
+            {{ product?.stock <= 0 ? 'Out of Stock' : (isInCart(product?.id || 0) ? ' In Cart' : '') }}
           </button>
           <!-- Wishlist button -->
           <button 

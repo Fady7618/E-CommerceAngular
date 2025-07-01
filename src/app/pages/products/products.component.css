@@ -90,7 +90,7 @@
 }
 
 .cart-icon:hover {
-  background-color: #db4444 !important;
+  background-color: #212529 !important;
   color: white !important;
   transform: scale(1.1);
 }
@@ -113,7 +113,7 @@
 }
 
 .cart-icon.adding {
-  animation: bounceIn 0.6s ease-in-out;
+  animation: heartBeat 0.6s ease-in-out;
 }
 
 /* Add to Cart Button */
@@ -131,7 +131,7 @@
 }
 
 .add-to-cart-btn:hover {
-  background-color: #db4444 !important;
+  background-color: #212529 !important;
   transform: translateY(-2px);
 }
 
@@ -237,10 +237,10 @@
   }
 }
 
-/* Loading States */
+/* Loading States
 .adding-to-cart {
   animation: pulse 1s infinite;
-}
+} */
 
 /* Discount Badge */
 .discount-badge {
@@ -335,5 +335,82 @@
   .stock-badge {
     font-size: 9px;
     padding: 2px 6px;
+  }
+}
+
+/* Add these styles to your existing CSS */
+
+/* Cart icon when in cart */
+.cart-icon.in-cart {
+  background-color: #212529 !important;
+  color: white !important;
+  opacity: 1;
+}
+
+/* Cart button when in cart */
+.add-to-cart-btn.bg-success {
+  background-color: #28a745 !important;
+}
+
+.add-to-cart-btn.bg-success:hover {
+  background-color: #218838 !important;
+}
+
+/* Add these styles at the end of your file */
+
+/* Go Up Button Styles */
+.go-up-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #db4444;
+  color: white;
+  border: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.go-up-btn.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.go-up-btn i {
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.go-up-btn:hover {
+  background-color: #c13a3a;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .go-up-btn {
+    width: 40px;
+    height: 40px;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .go-up-btn i {
+    font-size: 16px;
   }
 }

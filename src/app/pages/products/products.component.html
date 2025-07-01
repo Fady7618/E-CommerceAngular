@@ -27,9 +27,12 @@
         <!-- Action Buttons -->
         <div class="action-buttons">
           <i class="fa-solid fa-cart-shopping cart-icon bg-white p-2 rounded-circle" 
+             [ngClass]="{
+               'adding': item.addingToCart,
+               'disabled': item.stock <= 0,
+               'in-cart': isInCart(item.id)
+             }"
              (click)="addToCart(item)"
-             [class.adding]="item.addingToCart"
-             [class.disabled]="item.stock <= 0"
              title="Add to Cart"></i>
         </div>
         <div class="action-buttons wishlist-btn">
@@ -43,11 +46,19 @@
         </div>
         
         <!-- Add to Cart Button -->
-        <button class="border-0 bg-dark text-white text-center p-3 position-absolute w-100 add-to-cart-btn"
+        <button class="border-0 text-white text-center p-3 position-absolute w-100 add-to-cart-btn"
+                [ngClass]="{
+                  'bg-dark': !isInCart(item.id),
+                  'bg-success': isInCart(item.id)
+                }"
                 (click)="addToCart(item)"
                 [disabled]="item.stock <= 0">
-          <i class="fa-solid fa-cart-plus me-2"></i>
-          {{ item.stock <= 0 ? 'Out of Stock' : 'Add To Cart' }}
+          <i class="fa-cart-plus me-2" 
+             [ngClass]="{
+               'fa-solid': true,
+               'cart-icon-animated': item.addingToCart
+             }"></i>
+          {{ item.stock <= 0 ? 'Out of Stock' : (isInCart(item.id) ? 'In Cart' : 'Add To Cart') }}
         </button>
       </div>
       
@@ -117,3 +128,8 @@
   <p class="text-muted">Try browsing other categories or check back later.</p>
   <a routerLink="/" class="btn btn-primary">Back to Home</a>
 </div>
+
+<!-- Go Up Button -->
+<button class="go-up-btn" [ngClass]="{'show': showGoUpButton}" (click)="scrollToTop()">
+  <i class="fa-solid fa-arrow-up"></i>
+</button>

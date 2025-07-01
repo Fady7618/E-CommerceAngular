@@ -1,55 +1,87 @@
-<footer class="pt-5">
-  <div class="container g-0">
-    <div class="row rows-cols-2 d-flex justify-content-between">
-      <div class="col-sm-6 col-lg-3">
-        <div class="info">
-          <h1>Exclusive</h1>
-          <h4 class=" my-2">Subscribe</h4>
-          <p>Get 10% off your first order</p>
-          <div class="position-relative">
-            <input type="text" placeholder="Enter Your email" class="bg-light border border-1 border-white form-control border-0 ps-2">
-            <a routerLink="signup" ><i class="fa-solid fa-share position-absolute top-50 end-0 translate-middle text-dark"></i></a>
+<footer class="pt-4 pt-md-5">
+  <div class="container">
+    <div class="row gy-4">
+      <!-- Brand & Subscription Section -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="footer-section">
+          <h2 class="mb-2">Exclusive</h2>
+          <h5 class="my-3">Subscribe</h5>
+          <p class="mb-3">Get 10% off your first order</p>
+          <div class="position-relative subscription-input">
+            <input type="email" placeholder="Enter your email" class="form-control bg-light border-0 ps-3 pe-5 py-2">
+            <button class="btn position-absolute top-0 end-0 h-100 d-flex align-items-center justify-content-center border-0">
+              <i class="fa-solid fa-arrow-right text-dark"></i>
+            </button>
           </div>
         </div>
       </div>
-      <div class="col-sm-6 col-lg-3 p-sm-3">
-        <div class="Account">
-          <h4 class="text-light"> Account</h4>
-          <ul class="list-unstyled lh-lg">
-            <li><a class="link-offset-2 link-offset-3-hover link-underline-light link-underline-opacity-0 link-underline-opacity-75-hover" routerLink="profile">My Account</a></li>
-            <li><a class="link-offset-2 link-offset-3-hover link-underline-light link-underline-opacity-0 link-underline-opacity-75-hover" routerLink="signup">Login/Register</a></li>
-            <li><a class="link-offset-2 link-offset-3-hover link-underline-light link-underline-opacity-0 link-underline-opacity-75-hover" routerLink="cart">Cart</a></li>
-            <li><a class="link-offset-2 link-offset-3-hover link-underline-light link-underline-opacity-0 link-underline-opacity-75-hover" routerLink="wishlist">Wishlist</a></li>
-            <li><a class="link-offset-2 link-offset-3-hover link-underline-light link-underline-opacity-0 link-underline-opacity-75-hover" routerLink="products">Shop</a></li>
+
+      <!-- Account Links Section -->
+      <div class="col-12 col-sm-6 col-lg-3 d-none d-sm-inline-block">
+        <div class="footer-section">
+          <h5 class="mb-3 text-light">Account</h5>
+          <ul class="list-unstyled mb-0">
+            <li class="mb-2"><a class="footer-link" routerLink="/profile">My Account</a></li>
+            <li class="mb-2"><a class="footer-link" routerLink="/signup">Login/Register</a></li>
+            <li class="mb-2"><a class="footer-link" routerLink="/cart">Cart</a></li>
+            <li class="mb-2"><a class="footer-link" routerLink="/wishlist">Wishlist</a></li>
+            <li class="mb-2"><a class="footer-link" routerLink="/products">Shop</a></li>
           </ul>
         </div>
       </div>
-      <div class="col-sm-6 col-lg-3 p-sm-3">
-        <div class="support">
-          <h4 class="text-light">Support</h4>
-          <ul class="list-unstyled lh-lg">
-            <li>111 Bijoy Sarani, Dhaka, DH 1515, Bangladesh.</li>
-            <li>exclusive&#64;gmail.com</li>
-            <li>+88015-88888-9999</li>
+
+      <!-- Support Information Section -->
+      <div class="col-12 col-sm-6 col-lg-3 d-none d-sm-inline-block">
+        <div class="footer-section">
+          <h5 class="mb-3 text-light">Support</h5>
+          <ul class="list-unstyled mb-0">
+            <li class="mb-2 d-flex align-items-start">
+              <i class="fa-solid fa-location-dot me-2 mt-1"></i>
+              <span>111 Bijoy Sarani, Dhaka, DH 1515, Bangladesh.</span>
+            </li>
+            <li class="mb-2 d-flex align-items-center">
+              <i class="fa-solid fa-envelope me-2"></i>
+              <span>exclusive&#64;gmail.com</span>
+            </li>
+            <li class="mb-2 d-flex align-items-center">
+              <i class="fa-solid fa-phone me-2"></i>
+              <span>+88015-88888-9999</span>
+            </li>
           </ul>
         </div>
       </div>
-      <div class="col-sm-6 col-lg-3 p-sm-3">
-        <div class="Quick">
-          <h4 class="text-light"> Quick Link</h4>
-          <ul class="list-unstyled lh-lg">
-            <li>Privacy Policy</li>
-            <li>Terms Of Use</li>
-            <li>FAQ</li>
-            <li>Contact</li>
+
+      <!-- Quick Links Section -->
+      <div class="col-12 col-sm-6 col-lg-3 d-none d-sm-inline-block">
+        <div class="footer-section">
+          <h5 class="mb-3 text-light">Quick Links</h5>
+          <ul class="list-unstyled mb-0">
+            <li class="mb-2"><a class="footer-link" href="#">Privacy Policy</a></li>
+            <li class="mb-2"><a class="footer-link" href="#">Terms Of Use</a></li>
+            <li class="mb-2"><a class="footer-link" href="#">FAQ</a></li>
+            <li class="mb-2"><a class="footer-link" href="#">Contact</a></li>
           </ul>
         </div>
       </div>
     </div>
 
-  </div>
-  <div class="text-white-50  text-center border-top border-dark">
-    <p class="py-3 m-0">&copy;Copyright Rimel 2022 All right reserved</p>
+    <!-- Social Media Links - Optional -->
+    <div class="row mt-4">
+      <div class="col-12 d-flex justify-content-center">
+        <div class="social-links d-flex gap-3">
+          <a href="#" class="social-link"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Copyright Section -->
+  <div class="copyright-section mt-4 border-top border-dark py-3">
+    <div class="container">
+      <p class="text-white-50 text-center mb-0">&copy; Copyright Rimel 2022. All rights reserved.</p>
+    </div>
+  </div>
 </footer>

@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ProductService } from '../../Services/product.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CartService } from '../../Services/cart.service';
@@ -12,11 +13,14 @@ import Swal from 'sweetalert2';
   templateUrl: './products.component.html',
   styleUrl: './products.component.css'
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent implements OnInit, OnDestroy {
   products: Product[] = [];
   categoryName: string = '';
   loading = false;
+  showGoUpButton: boolean = false;
   wishlistItems: any[] = [];
+  cartItems: any[] = []; // Add this property at the class level with your other properties
+  private authSubscription: Subscription;
 
   // Default placeholder image
   defaultImage = 'https://via.placeholder.com/300x300?text=No+Image';
@@ -28,14 +32,46 @@ export class ProductsComponent implements OnInit {
     private cartService: CartService,
     private wishlistService: WishlistService,
     private globalService: GlobalService
-  ) {}
+  ) {
+    // Remove the subscription from here since we're already handling it in ngOnInit
+  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.categoryName = params['name'];
       this.loadProducts();
     });
-    this.loadWishlist();
+    
+    // Initial data loading based on login state
+    if (this.globalService.is_login) {
+      this.loadWishlist();
+      this.loadCart();
+    } else {
+      this.wishlistItems = []; 
+      this.cartItems = [];
+    }
+
+    // Subscribe to login state changes
+    this.authSubscription = this.globalService.loginState$.subscribe(isLoggedIn => {
+      if (isLoggedIn) {
+        this.loadWishlist();
+        this.loadCart();
+      } else {
+        this.wishlistItems = [];
+        this.cartItems = [];
+      }
+    });
+
+    window.addEventListener('scroll', this.handleScroll.bind(this));
+  }
+
+  ngOnDestroy() {
+    // Clean up subscription to prevent memory leaks
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+
+    window.removeEventListener('scroll', this.handleScroll.bind(this));
   }
 
   loadProducts() {
@@ -130,8 +166,20 @@ export class ProductsComponent implements OnInit {
     });
   }
 
+  // Add this method to load cart items
+  loadCart() {
+    this.cartService.getCart().subscribe({
+      next: (res) => {
+        this.cartItems = res.products || [];
+      },
+      error: (err) => {
+        console.error('Error loading cart:', err);
+      }
+    });
+  }
+
   addToCart(product: Product) {
-    if (this.globalService.isLoggedIn() || true) {
+    if (this.globalService.is_login) { // Remove the "|| true" that was causing the issue
       product.addingToCart = true;
       
       console.log('Adding product to cart:', product);
@@ -186,12 +234,30 @@ export class ProductsComponent implements OnInit {
         }
       });
     } else {
-      this.router.navigate(['/login']);
+      // Show login/signup alert
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please login or create an account to add items to your cart',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Sign Up',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#28a745'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Navigate to login page
+          this.router.navigate(['/login']);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          // Navigate to signup page
+          this.router.navigate(['/signup']);
+        }
+      });
     }
   }
 
   toggleWishlist(product: Product) {
-    if (this.globalService.isLoggedIn() || true) {
+    if (this.globalService.is_login) { // Remove the "|| true" that was causing the issue
       const isInWishlist = this.isInWishlist(product.id);
       
       if (isInWishlist) {
@@ -200,7 +266,25 @@ export class ProductsComponent implements OnInit {
         this.addToWishlist(product);
       }
     } else {
-      this.router.navigate(['/login']);
+      // Show login/signup alert
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please login or create an account to add items to your wishlist',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Sign Up',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#28a745'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Navigate to login page
+          this.router.navigate(['/login']);
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          // Navigate to signup page
+          this.router.navigate(['/signup']);
+        }
+      });
     }
   }
 
@@ -298,6 +382,15 @@ export class ProductsComponent implements OnInit {
     );
   }
 
+  // Add the isInCart method that your template is trying to call
+  isInCart(productId: number): boolean {
+    if (!productId || !this.cartItems || !this.cartItems.length) return false;
+    
+    return this.cartItems.some(item => 
+      (item.product_id === productId) || (item.id === productId)
+    );
+  }
+
   // Helper method to get stock status
   getStockStatus(product: Product): string {
     if (product.stock <= 0) return 'Out of Stock';
@@ -319,5 +412,17 @@ export class ProductsComponent implements OnInit {
       target.src = this.defaultImage;
       target.onerror = null; // Prevent infinite loop
     }
+  }
+  // Add these new methods
+  handleScroll() {
+    // Show button when user scrolls down 500px
+    this.showGoUpButton = window.scrollY > 500;
+  }
+  
+  scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   }
 }

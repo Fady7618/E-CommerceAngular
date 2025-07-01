@@ -2,50 +2,106 @@ footer {
   background-color: black;
   color: #fff;
 }
-input:focus::placeholder{
-  transform: translateX(3px);
-  transition: 0.2s;
+
+/* Section Styling */
+.footer-section {
+  margin-bottom: 10px;
 }
-input::placeholder{
-  color: darkgray;
-  transition: 0.2s;
+
+/* Link Styling */
+.footer-link {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
-img{
-  width: 100%;
-}
-a{
+
+.footer-link:hover {
   color: white;
 }
-i{
+
+/* Subscription Input */
+.subscription-input {
+  max-width: 300px;
+}
+
+.subscription-input input {
+  height: 46px;
+  transition: all 0.3s ease;
+}
+
+.subscription-input input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+}
+
+.subscription-input button {
+  width: 46px;
+  background: transparent;
+}
+
+.subscription-input button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Social Media Links */
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  background-clip: text;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  text-decoration: none;
 }
-a:hover .fa-facebook-f{
-  color: transparent;
-  background: #1877F2;
-  -webkit-background-clip: text;
-  background-clip: text;
-  transition: 0.2s;
+
+.social-link:hover {
+  transform: translateY(-3px);
 }
-a:hover .fa-twitter{
-  color: transparent;
-  background: #1DA1F2;
-  -webkit-background-clip: text;
-  background-clip: text;
-  transition: 0.2s;
+
+/* Icon Styling */
+.fa-facebook-f:hover {
+  color: #1877F2;
 }
-a:hover .fa-instagram{
-  color: transparent;
-  background: linear-gradient(#5b51d8,#c13584, #833ab4,#fd1d1d,#f77737,#fcaf45,#405de6);
-  -webkit-background-clip: text;
-  background-clip: text;
-  transition: 0.2s;
+
+.fa-twitter:hover {
+  color: #1DA1F2;
 }
-a:hover .fa-linkedin{
-  color: transparent;
-  background: #0A63BC;
-  -webkit-background-clip: text;
-  background-clip: text;
-  transition: 0.2s;
+
+.fa-instagram:hover {
+  color: #E1306C;
+}
+
+.fa-linkedin:hover {
+  color: #0A66C2;
+}
+
+/* Copyright Section */
+.copyright-section {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767px) {
+  .footer-section {
+    text-align: center;
+  }
+  
+  .subscription-input {
+    margin: 0 auto;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+  
+  ul.list-unstyled li.d-flex {
+    justify-content: center;
+  }
+}
+
+/* Font Awesome override */
+.fa-classic, .fa-regular, .fa-solid, .far, .fas {
+  font-family: "Font Awesome 6 Free";
 }

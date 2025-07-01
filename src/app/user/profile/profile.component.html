@@ -36,8 +36,15 @@
         </div>
         <div class="col-md-6 mb-3">
           <label for="">Phone</label>
-          <input type="text" class="bg-body-tertiary border-0 form-control" name="phone"
-            [(ngModel)]="model.phone" required #phone="ngModel"
+          <input type="text" 
+            class="bg-body-tertiary border-0 form-control" 
+            name="phone"
+            [(ngModel)]="model.phone" 
+            required 
+            pattern="[0-9]{11}"
+            maxlength="11"
+            (keypress)="validateNumberInput($event)"
+            #phone="ngModel"
             [ngClass]="{'is-invalid': registerForm.submitted && phone.invalid}">
           <span class="text-danger" *ngIf="registerForm.submitted && phone.invalid">
             Phone Number is Required
