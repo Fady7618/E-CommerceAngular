@@ -46,17 +46,19 @@ export class AuthService {
     return this.Http.post(`${this.baseUrl}users`, obj);
   }
 
-  getPrfile(): Observable<any> {
+  // Fix the method name from "getPrfile" to "getProfile"
+  getProfile(): Observable<any> {
+    // If using mock auth or for new users who haven't set up their profile yet
     if (this.useMockAuth) {
-      // Mock profile data from localStorage
-      const userData = JSON.parse(localStorage.getItem('mock_user') || '{}');
+      // Get user data from localStorage
+      const userData = JSON.parse(localStorage.getItem('user') || '{}');
       return of({
         data: {
           customer_id: 1,
-          customer_first_name: userData.first_name || 'John',
-          customer_last_name: userData.last_name || 'Doe',
-          customer_email: userData.email || 'john@example.com',
-          customer_phone: userData.phone || '123-456-7890'
+          customer_first_name: userData.first_name || '',
+          customer_last_name: userData.last_name || '',
+          customer_email: userData.email || '',
+          customer_phone: userData.phone || ''
         }
       });
     }

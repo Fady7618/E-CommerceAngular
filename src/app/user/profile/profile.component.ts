@@ -25,22 +25,32 @@ export class ProfileComponent {
     confirm_password: ''
   };
   constructor(private global: GlobalService, private auth: AuthService, private router: Router) {
-    auth.getPrfile().subscribe(res => {
+    // Fix method name from getPrfile to getProfile
+    auth.getProfile().subscribe(res => {
       this.model.first_name = res.data.customer_first_name;
       this.model.last_name = res.data.customer_last_name;
       this.model.email = res.data.customer_email;
       this.model.phone = res.data.customer_phone;
-      this.userId = res.data.customer_id
+      this.userId = res.data.customer_id;
     }, (err) => {
-      router.navigateByUrl('/')
-    })
+      router.navigateByUrl('/');
+    });
   }
   handleSubmit(registerForm: any) {
     if (registerForm.valid) {
-      this.auth.updateProfile(this.model ,this.userId).subscribe(
+      this.auth.updateProfile(this.model, this.userId).subscribe(
         (res) => {
-          console.log(res);
+          // Update localStorage with new user data
+          const userData = {
+            first_name: res.data.customer_first_name,
+            last_name: res.data.customer_last_name,
+            email: res.data.customer_email,
+            phone: res.data.customer_phone
+          };
+          
+          localStorage.setItem('user', JSON.stringify(userData));
           localStorage.setItem('user_name', res.data.customer_first_name);
+          
           Swal.fire({
             title: 'Success!',
             text: 'Update Profile Successfully.',

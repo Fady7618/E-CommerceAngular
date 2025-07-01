@@ -39,10 +39,22 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.auth.login(this.loginForm.value).subscribe(res => {
         if (res.status == 'Success') {
+          // Store token and name for authentication
           localStorage.setItem('user_token', res.data.token);
           localStorage.setItem('user_name', res.data.first_name);
           
-          // Use the new login method instead of setting properties directly
+          // Store complete user data
+          const userData = {
+            first_name: res.data.first_name,
+            last_name: res.data.last_name,
+            email: res.data.email,
+            phone: res.data.phone
+          };
+          
+          // Store user data in localStorage
+          localStorage.setItem('user', JSON.stringify(userData));
+          
+          // Use the global login method
           this.global.login(res.data.first_name);
           
           Swal.fire({

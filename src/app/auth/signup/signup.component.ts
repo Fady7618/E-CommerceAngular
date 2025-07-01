@@ -57,10 +57,25 @@ export class SignupComponent {
     if (registerForm.valid) {
       this.auth.register(this.model).subscribe(
         (res) => {
+          // Store token and name for authentication
           localStorage.setItem('user_token', res.data.token);
           localStorage.setItem('user_name', res.data.first_name);
           
-          // Use the new login method
+          // Store complete user data
+          const userData = {
+            first_name: res.data.first_name,
+            last_name: res.data.last_name,
+            email: res.data.email,
+            phone: res.data.phone
+          };
+          
+          // Store user data in localStorage
+          localStorage.setItem('user', JSON.stringify(userData));
+          
+          // Initialize empty user data structures
+          this.initializeEmptyUserData();
+          
+          // Use the global login method
           this.global.login(res.data.first_name);
           
           Swal.fire({
@@ -83,5 +98,17 @@ export class SignupComponent {
         }
       );
     }
+  }
+
+  // Add this new method to initialize empty user data
+  private initializeEmptyUserData(): void {
+    // Initialize empty cart
+    localStorage.setItem('cart_items', JSON.stringify([]));
+    
+    // Initialize empty wishlist
+    localStorage.setItem('wishlist_items', JSON.stringify([]));
+    
+    // Initialize empty addresses
+    localStorage.setItem('user_addresses', JSON.stringify([]));
   }
 }

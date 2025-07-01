@@ -28,9 +28,9 @@ export class GlobalService {
   }
 
   // Call this when user logs in
-  login(username: string): void {
-    this.userName = username;
+  login(name: string) {
     this.is_login = true;
+    this.userName = name;
     this._loginStateSubject.next(true);
   }
 
@@ -39,5 +39,15 @@ export class GlobalService {
     this.userName = '';
     this.is_login = false;
     this._loginStateSubject.next(false);
+  }
+
+  // Add a method to completely reset user data (could be called on logout too)
+  resetAllUserData() {
+    localStorage.removeItem('cart_items');
+    localStorage.removeItem('wishlist_items');
+    localStorage.removeItem('user_addresses');
+    localStorage.removeItem('user');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_token');
   }
 }
