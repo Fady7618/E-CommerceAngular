@@ -1,7 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap');
 footer {
-  background-color: black;
+  background-color: #000;
   color: #fff;
 }
+
+.recursiveFont {
+  font-family: "Kaushan Script", cursive;
+  font-weight: 600;
+  font-style: normal;
+}
+
 
 /* Section Styling */
 .footer-section {
@@ -16,7 +24,7 @@ footer {
 }
 
 .footer-link:hover {
-  color: white;
+  color: #fff !important;
 }
 
 /* Subscription Input */
@@ -43,7 +51,7 @@ footer {
 }
 
 /* Social Media Links */
-.social-link {
+.social-link, .social-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,30 +64,58 @@ footer {
   text-decoration: none;
 }
 
-.social-link:hover {
+.social-link:hover, .social-icon:hover {
   transform: translateY(-3px);
 }
 
-/* Icon Styling */
+/* Specific hover colors for social icons */
 .fa-facebook-f:hover {
-  color: #1877F2;
+  color: #1877F2 !important;
 }
 
 .fa-twitter:hover {
-  color: #1DA1F2;
+  color: #1DA1F2 !important;
 }
 
 .fa-instagram:hover {
-  color: #E1306C;
+  color: #E1306C !important;
 }
 
 .fa-linkedin:hover {
-  color: #0A66C2;
+  color: #0A66C2 !important;
 }
 
 /* Copyright Section */
 .copyright-section {
   border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* GSAP marquee styling */
+.gsap-marquee {
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.marquee-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.marquee-track {
+  display: flex;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.marquee-content {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0; /* Prevent content from shrinking */
+}
+
+.marquee-content p {
+  margin-bottom: 0;
 }
 
 /* Responsive Adjustments */
