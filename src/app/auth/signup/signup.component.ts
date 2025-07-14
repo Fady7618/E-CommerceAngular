@@ -17,6 +17,7 @@ export class SignupComponent {
   // Define validation patterns
   phonePattern = "[0-9]{11}";
   passwordPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d\\W]{8,}$";
+  isLoading = false;
 
   model: Register = {
     first_name: '',
@@ -29,34 +30,20 @@ export class SignupComponent {
 
   // Add this method to validate digits only
   validateNumberInput(event: any): boolean {
-    const pattern = /^[0-9]$/;
-    const inputChar = String.fromCharCode(event.charCode);
-    
-    // Allow special keys like backspace, delete, arrows, etc.
-    if (event.charCode === 0) {
-      return true;
-    }
-    
-    // Only allow digit characters
-    if (!pattern.test(inputChar)) {
-      // Invalid character, prevent it from being entered
+    const charCode = (event.which) ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
       event.preventDefault();
       return false;
     }
-    
-    // Check length to prevent more than 11 digits
-    if (event.target.value.length >= 11 && event.key !== 'Backspace') {
-      event.preventDefault();
-      return false;
-    }
-    
     return true;
   }
 
   handleSubmit(registerForm: any) {
     if (registerForm.valid) {
+      this.isLoading = true;
       this.auth.register(this.model).subscribe(
         (res) => {
+          this.isLoading = false;
           // Store token and name for authentication
           localStorage.setItem('user_token', res.data.token);
           localStorage.setItem('user_name', res.data.first_name);
@@ -89,6 +76,7 @@ export class SignupComponent {
           });
         },
         (err) => {
+          this.isLoading = false;
           Swal.fire({
             title: 'Error!',
             text: err.error?.message || 'Registration failed. Please try again.',
@@ -110,5 +98,10 @@ export class SignupComponent {
     
     // Initialize empty addresses
     localStorage.setItem('user_addresses', JSON.stringify([]));
+  }
+  
+  // Add this method for Google signup
+  signupWithGoogle(): void {
+    window.location.href = this.auth.getGoogleAuthUrl();
   }
 }

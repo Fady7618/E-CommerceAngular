@@ -1,70 +1,164 @@
-<div class="row justify-content-between my-5">
-  <div class="col-lg-7 d-flex align-items-center">
+<div class="row justify-content-between my-5 align-items-center">
+  <div class="col-lg-7">
     <div class="img">
-      <img src="images/cart.png" alt="">
+      <img src="/images/cart.png" alt="">
     </div>
   </div>
-  <div class="col-lg-5 ps-md-5 col-12">
+
+  <div class="col-lg-5 px-md-3 col-12">
     <h2>Create an account</h2>
+    
     <form #registerForm="ngForm" (ngSubmit)="handleSubmit(registerForm)">
-      <input type="text" class="auth_input my-3" placeholder="First Name" name="firstName" [(ngModel)]="model.first_name"
-        required #firstName="ngModel">
-      <span class="text-danger" *ngIf="registerForm.submitted && firstName.invalid">First Name is Required</span>
-      <input type="text" class="auth_input my-3" placeholder="Last Name" name="lastName" [(ngModel)]="model.last_name"
-        required #lastName="ngModel">
-      <span class="text-danger" *ngIf="registerForm.submitted && lastName.invalid">Last Name is Required</span>
-      <input type="email" class="auth_input my-3" placeholder="Email" name="email" [(ngModel)]="model.email" required email #email="ngModel">
-      <span class="text-danger" *ngIf="registerForm.submitted && email.invalid">
-        <span *ngIf="email.errors?.['required']">Email is Required</span>
-        <span *ngIf="email.errors?.['email']">Invalid Email Format</span>
-      </span>
-      <input 
-        type="text" 
-        class="auth_input my-3" 
-        placeholder="Phone Number (11 digits)" 
-        name="phone" 
-        [(ngModel)]="model.phone" 
-        required
-        pattern="[0-9]{11}"
-        maxlength="11"
-        (keypress)="validateNumberInput($event)"
-        #phone="ngModel">
-      <span class="text-danger" *ngIf="registerForm.submitted && phone.invalid">
-        <span *ngIf="phone.errors?.['required']">Phone Number is Required</span>
-        <span *ngIf="phone.errors?.['pattern']">Phone Number must be exactly 11 digits</span>
-      </span>
-      <input 
-        type="password" 
-        class="auth_input my-3" 
-        placeholder="Password" 
-        name="password" 
-        [(ngModel)]="model.password"
-        required 
-        minlength="8" 
-        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W]{8,}$"
-        #password="ngModel">
-      <span class="text-danger" *ngIf="registerForm.submitted && password.invalid">
-        <span *ngIf="password.errors?.['required']">Password is Required</span>
-        <span *ngIf="password.errors?.['minlength']">Password must be at least 8 characters</span>
-        <span *ngIf="password.errors?.['pattern']">Password must contain at least one uppercase letter, one lowercase letter, and one number</span>
-      </span>
-      <input 
-        type="password" 
-        class="auth_input my-3" 
-        placeholder="Re-enter Your Password" 
-        name="confirm_password"
-        [(ngModel)]="model.confirm_password" 
-        required 
-        [pattern]="model.password" 
-        #confirm_password="ngModel">
-      <span class="text-danger" *ngIf="registerForm.submitted && confirm_password.invalid">
-        <span *ngIf="confirm_password.errors?.['required']">Confirmation is Required</span>
-        <span *ngIf="confirm_password.errors?.['pattern']">Passwords do not match</span>
-      </span>
-      <button class="btn btn-form mt-3">Create Account</button>
+      <!-- First Name field -->
+      <div class="form-group position-relative">
+        <input 
+          type="text" 
+          class="auth_input my-3" 
+          placeholder="First Name" 
+          name="firstName" 
+          [(ngModel)]="model.first_name"
+          required 
+          #firstName="ngModel"
+          [ngClass]="{'is-invalid': registerForm.submitted && firstName.invalid}">
+        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && firstName.invalid">
+          <div *ngIf="firstName.errors?.['required']">
+            First Name is required
+          </div>
+        </div>
+      </div>
+
+      <!-- Last Name field -->
+      <div class="form-group position-relative">
+        <input 
+          type="text" 
+          class="auth_input my-3" 
+          placeholder="Last Name" 
+          name="lastName" 
+          [(ngModel)]="model.last_name"
+          required 
+          #lastName="ngModel"
+          [ngClass]="{'is-invalid': registerForm.submitted && lastName.invalid}">
+        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && lastName.invalid">
+          <div *ngIf="lastName.errors?.['required']">
+            Last Name is required
+          </div>
+        </div>
+      </div>
+      
+      <!-- Email field -->
+      <div class="form-group position-relative">
+        <input 
+          type="email" 
+          class="auth_input my-3" 
+          placeholder="Email" 
+          name="email" 
+          [(ngModel)]="model.email" 
+          required 
+          email 
+          #email="ngModel"
+          [ngClass]="{'is-invalid': registerForm.submitted && email.invalid}">
+        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && email.invalid">
+          <div *ngIf="email.errors?.['required']">
+            Email is required
+          </div>
+          <div *ngIf="email.errors?.['email']">
+            Invalid Email Format
+          </div>
+        </div>
+      </div>
+      
+      <!-- Phone Number field -->
+      <div class="form-group position-relative">
+        <input 
+          type="text" 
+          class="auth_input my-3" 
+          placeholder="Phone Number (11 digits)" 
+          name="phone" 
+          [(ngModel)]="model.phone" 
+          required
+          pattern="[0-9]{11}"
+          maxlength="11"
+          (keypress)="validateNumberInput($event)"
+          #phone="ngModel"
+          [ngClass]="{'is-invalid': registerForm.submitted && phone.invalid}">
+        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && phone.invalid">
+          <div *ngIf="phone.errors?.['required']">
+            Phone Number is required
+          </div>
+          <div *ngIf="phone.errors?.['pattern']">
+            Phone Number must be exactly 11 digits
+          </div>
+        </div>
+      </div>
+      
+      <!-- Password field -->
+      <div class="form-group position-relative">
+        <input 
+          type="password" 
+          class="auth_input my-3" 
+          placeholder="Password" 
+          name="password" 
+          [(ngModel)]="model.password"
+          required 
+          minlength="8" 
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W]{8,}$"
+          #password="ngModel"
+          [ngClass]="{'is-invalid': registerForm.submitted && password.invalid}">
+        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && password.invalid">
+          <div *ngIf="password.errors?.['required']">
+            Password is required
+          </div>
+          <div *ngIf="password.errors?.['minlength']">
+            Password must be at least 8 characters
+          </div>
+          <div *ngIf="password.errors?.['pattern']">
+            Password must contain at least one uppercase letter, one lowercase letter, and one number
+          </div>
+        </div>
+      </div>
+      
+      <!-- Confirm Password field -->
+      <div class="form-group position-relative">
+        <input 
+          type="password" 
+          class="auth_input my-3" 
+          placeholder="Confirm Password" 
+          name="confirm_password"
+          [(ngModel)]="model.confirm_password" 
+          required 
+          [pattern]="model.password" 
+          #confirm_password="ngModel"
+          [ngClass]="{'is-invalid': registerForm.submitted && confirm_password.invalid}">
+        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && confirm_password.invalid">
+          <div *ngIf="confirm_password.errors?.['required']">
+            Confirmation is required
+          </div>
+          <div *ngIf="confirm_password.errors?.['pattern']">
+            Passwords do not match
+          </div>
+        </div>
+      </div>
+      
+      <!-- Registration Buttons Section - Side by Side -->
+      <div class="mt-3">
+        <div class="row d-flex justify-content-evenly gx-3">
+          <div class="col-5">
+            <button type="submit" class="btn btn-danger w-100 py-2 fw-medium" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Register
+            </button>
+          </div>
+          <div class="col-5">
+            <button type="button" class="btn bg-transparent btn-outline-dark w-100 py-2 d-flex justify-content-center align-items-center text-dark" (click)="signupWithGoogle()">
+              <img src="/images/google.png" alt="Google" class="me-2" width="18" height="18">
+              Google
+            </button>
+          </div>
+        </div>
+      </div>
     </form>
 
-    <div class="d-flex mt-3" style="gap: 10px;">
+    <div class="d-flex mt-3 justify-content-center" style="gap: 10px;">
       <p>Already have account?</p>
       <a routerLink="/login" class="text-black">Log in</a>
     </div>

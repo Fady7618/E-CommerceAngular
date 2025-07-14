@@ -4,7 +4,7 @@
   font-family: "Poppins", sans-serif;
 }
 
-img {
+.col-lg-7 img {
   width: 100%;
   height: auto;
 }
@@ -29,7 +29,7 @@ button {
   background: rgba(219, 68, 68, 1);
   width: 100%;
   color: #fff;
-  padding: 16px 120px;
+  /* padding: 16px 120px; */
   border-radius: 8px;
   transition: 0.2s;
 }
