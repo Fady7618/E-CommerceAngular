@@ -21,6 +21,12 @@ const frontendUrl = process.env.NODE_ENV === 'production'
   ? process.env.FRONTEND_URL_PRODUCTION
   : process.env.FRONTEND_URL;
 
+// Get Frontend URLs for CORS
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URL_PRODUCTION
+];
+
 // Connect to MongoDB
 mongoose.connect(MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
@@ -31,7 +37,15 @@ mongoose.connect(MONGO_URI)
 
 // Middleware
 app.use(cors({
-  origin: frontendUrl,
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
