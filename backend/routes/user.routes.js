@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth.middleware');
+const userController = require('../controllers/user.controller');
 
 // Protected routes
 router.use(authMiddleware.protect);
@@ -31,5 +32,12 @@ router.get('/profile', async (req, res) => {
     });
   }
 });
+
+/**
+ * @route PUT /api/users/:id
+ * @desc Update user profile
+ * @access Private
+ */
+router.put('/:id', userController.updateProfile);
 
 module.exports = router;

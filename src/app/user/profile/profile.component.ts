@@ -24,16 +24,15 @@ export class ProfileComponent {
     new_password: '',
     confirm_password: ''
   };
-  constructor(private global: GlobalService, private auth: AuthService, private router: Router) {
-    // Fix method name from getPrfile to getProfile
-    auth.getProfile().subscribe(res => {
-      this.model.first_name = res.data.customer_first_name;
-      this.model.last_name = res.data.customer_last_name;
-      this.model.email = res.data.customer_email;
-      this.model.phone = res.data.customer_phone;
-      this.userId = res.data.customer_id;
-    }, (err) => {
-      router.navigateByUrl('/');
+  constructor(private auth: AuthService, private router: Router) {
+    this.auth.currentUser$.subscribe(user => {
+      if (user) {
+        this.model.first_name = user.first_name || user.customer_first_name || '';
+        this.model.last_name = user.last_name || user.customer_last_name || '';
+        this.model.email = user.email || user.customer_email || '';
+        this.model.phone = user.phone || user.customer_phone || '';
+        this.userId = user._id || user.customer_id || '';
+      }
     });
   }
   handleSubmit(registerForm: any) {
@@ -50,7 +49,7 @@ export class ProfileComponent {
           
           localStorage.setItem('user', JSON.stringify(userData));
           localStorage.setItem('user_name', res.data.customer_first_name);
-          
+          this.auth.updateCurrentUser(userData);
           Swal.fire({
             title: 'Success!',
             text: 'Update Profile Successfully.',

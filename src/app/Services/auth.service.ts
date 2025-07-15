@@ -11,10 +11,10 @@ import { environment } from '../../environments/environment';
 export class AuthService {
 
   baseUrl = 'https://fakestoreapi.com/';  // Changed to FakeStore API
-  useMockAuth = true; // Using mock auth since FakeStore doesn't have auth endpoints
+  useMockAuth = false; // Using mock auth since FakeStore doesn't have auth endpoints
   
   // Add these new properties for OAuth
-  private apiUrl = 'http://localhost:5000/api/auth'; // Will be updated from environment
+  private apiUrl = 'http://localhost:5000/api';
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   public isAuthenticated = false;
@@ -32,69 +32,33 @@ export class AuthService {
 
   // Existing login method
   login(obj: any): Observable<any> {
-    if (this.useMockAuth) {
-      // Mock login - simulate successful login
-      return of({
-        status: 'Success',
-        data: {
-          token: 'mock-token-' + Date.now(),
-          first_name: 'John',
-          last_name: 'Doe',
-          email: obj.email
-        }
-      });
-    }
-    return this.Http.post(`${this.baseUrl}auth/login`, obj);
-  }
-
-  // Existing register method
-  register(obj: any): Observable<any> {
-    if (this.useMockAuth) {
-      // Mock registration - simulate successful registration
-      return of({
-        status: 'Success',
-        data: {
-          token: 'mock-token-' + Date.now(),
-          first_name: obj.first_name,
-          last_name: obj.last_name,
-          email: obj.email,
-          phone: obj.phone
-        }
-      });
-    }
-    return this.Http.post(`${this.baseUrl}users`, obj);
-  }
-
-  // Google OAuth method - NEW
-  googleAuth(code: string): Observable<any> {
-    if (this.useMockAuth) {
-      // Mock Google auth - simulate successful login with Google
-      return of({
-        status: 'Success',
-        data: {
-          token: 'mock-google-token-' + Date.now(),
-          first_name: 'Google',
-          last_name: 'User',
-          email: 'google.user@example.com',
-          profile_image: 'https://via.placeholder.com/150',
-          provider: 'google'
-        }
-      }).pipe(
-        tap(response => {
-          if (response.status === 'Success') {
-            this.storeUserData(response.data);
-          }
-        })
-      );
-    }
-    return this.Http.post(`${this.apiUrl}/google`, { code }).pipe(
-      tap(response => {
-        if (response.status === 'Success') {
-          this.storeUserData(response.data);
+    return this.Http.post(`${this.apiUrl}/login`, obj).pipe(
+      tap((res: any) => {
+        // Only update state if login is successful
+        if (res && res.data && res.data.token) {
+          localStorage.setItem('user_token', res.data.token);
+          localStorage.setItem('user', JSON.stringify(res.data));
+          this.currentUserSubject.next(res.data);
         }
       })
     );
   }
+
+  // Existing register method
+  register(obj: any): Observable<any> {
+    return this.Http.post(`${this.apiUrl}/auth/register`, obj);
+  }
+
+  // Google OAuth method - NEW
+  googleAuth(code: string): Observable<any> {
+  return this.Http.post(`${this.apiUrl}/auth/google`, { code }).pipe(
+    tap(response => {
+      if (response.status === 'Success') {
+        this.storeUserData(response.data);
+      }
+    })
+  );
+}
 
   // Store user data - NEW
   private storeUserData(userData: any): void {
@@ -131,19 +95,7 @@ export class AuthService {
 
   // Existing updateProfile method
   updateProfile(obj: any, id: any): Observable<any> {
-    if (this.useMockAuth) {
-      // Mock profile update
-      localStorage.setItem('mock_user', JSON.stringify(obj));
-      return of({
-        data: {
-          customer_first_name: obj.first_name,
-          customer_last_name: obj.last_name,
-          customer_email: obj.email,
-          customer_phone: obj.phone
-        }
-      });
-    }
-    return this.Http.put(`${this.baseUrl}users/${id}`, obj);
+    return this.Http.put(`${this.apiUrl}/users/${id}`, obj);
   }
 
   // Existing updateUserImage method
@@ -184,5 +136,9 @@ export class AuthService {
     const redirectUri = encodeURIComponent('http://localhost:4200/auth/callback');
     
     return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile&prompt=select_account`;
+  }
+
+  public updateCurrentUser(user: any): void {
+    this.currentUserSubject.next(user);
   }
 }

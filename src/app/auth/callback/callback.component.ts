@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../Services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-callback',
@@ -38,7 +39,15 @@ export class CallbackComponent implements OnInit {
       // Exchange code for tokens
       this.authService.googleAuth(code).subscribe({
         next: () => {
-          this.router.navigate(['/']);
+          Swal.fire({
+            title: 'Success!',
+            text: 'You have successfully logged in with Google.',
+            icon: 'success',
+            timer: 1200,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = '/'; // Reloads and routes to home
+          });
         },
         error: (err) => {
           console.error('Google auth error:', err);

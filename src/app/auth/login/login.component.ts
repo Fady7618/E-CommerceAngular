@@ -55,49 +55,41 @@ export class LoginComponent {
     this.isSubmitted = true;
     if (this.loginForm.valid) {
       this.isLoading = true;
-      this.auth.login(this.loginForm.value).subscribe({
-        next: (res) => {
+      this.auth.login(this.loginForm.value).subscribe(
+        (res) => {
           this.isLoading = false;
-          if (res.status == 'Success') {
-            // Store token and name for authentication
+          if (res && res.data && res.data.token) {
             localStorage.setItem('user_token', res.data.token);
-            localStorage.setItem('user_name', res.data.first_name);
-            
-            // Store complete user data
-            const userData = {
-              first_name: res.data.first_name,
-              last_name: res.data.last_name,
-              email: res.data.email,
-              phone: res.data.phone
-            };
-            
-            // Store user data in localStorage
-            localStorage.setItem('user', JSON.stringify(userData));
-            
-            // Use the global login method
+            localStorage.setItem('user', JSON.stringify(res.data));
+            this.auth.updateCurrentUser(res.data);
             this.global.login(res.data.first_name);
-            
+
+            // Show Swal success alert and route to home
             Swal.fire({
               title: 'Success!',
-              text: 'Login Successfully.',
+              text: 'You have successfully logged in.',
               icon: 'success',
               timer: 1000,
               showConfirmButton: false
             }).then(() => {
-              this.router.navigateByUrl(this.returnUrl);
+              this.router.navigateByUrl('/');
             });
           }
         },
-        error: (err) => {
+        (err) => {
           this.isLoading = false;
+          let message = err.error?.message || 'Login failed. Please try again.';
+          if (message === 'Please log in with Google') {
+            message = 'This account was created with Google. Please use Google login.';
+          }
           Swal.fire({
             title: 'Error!',
-            text: err.error?.message || 'Login failed. Please try again.',
+            text: message,
             icon: 'error',
             confirmButtonText: 'OK'
           });
         }
-      });
+      );
     }
   }
 

@@ -69,36 +69,22 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Find user by email
     const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(401).json({
-        status: 'Error',
-        message: 'Invalid email or password'
-      });
+      return res.status(401).json({ status: 'Error', message: 'Invalid email or password' });
     }
 
-    // Check if user is using OAuth
-    if (user.provider === 'google' && !user.password) {
-      return res.status(400).json({
-        status: 'Error',
-        message: 'Please log in with Google'
-      });
+    if (user.provider === 'google') {
+      return res.status(400).json({ status: 'Error', message: 'Please log in with Google' });
     }
 
-    // Check password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      return res.status(401).json({
-        status: 'Error',
-        message: 'Invalid email or password'
-      });
+      return res.status(401).json({ status: 'Error', message: 'Invalid email or password' });
     }
 
-    // Generate token
     const token = generateToken(user._id);
-
     res.json({
       status: 'Success',
       data: {
@@ -112,11 +98,7 @@ exports.login = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({
-      status: 'Error',
-      message: error.message
-    });
+    res.status(500).json({ status: 'Error', message: error.message });
   }
 };
 

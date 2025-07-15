@@ -5,24 +5,24 @@
     </div>
   </div>
 
-  <div class="col-lg-5 px-md-3 col-12">
+  <div class="col-lg-5 px-md-4 col-12">
     <h2>Create an account</h2>
     
-    <form #registerForm="ngForm" (ngSubmit)="handleSubmit(registerForm)">
+    <form [formGroup]="signupForm" (ngSubmit)="handleSubmit()">
       <!-- First Name field -->
       <div class="form-group position-relative">
         <input 
           type="text" 
           class="auth_input my-3" 
           placeholder="First Name" 
-          name="firstName" 
-          [(ngModel)]="model.first_name"
-          required 
-          #firstName="ngModel"
-          [ngClass]="{'is-invalid': registerForm.submitted && firstName.invalid}">
-        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && firstName.invalid">
-          <div *ngIf="firstName.errors?.['required']">
+          formControlName="first_name"
+          [ngClass]="{'is-invalid': signupForm.touched && f.first_name.invalid}">
+        <div class="text-danger validation-messages" *ngIf="f.first_name.touched && f.first_name.invalid">
+          <div *ngIf="f.first_name.errors?.['required']">
             First Name is required
+          </div>
+          <div *ngIf="f.first_name.errors?.['pattern']">
+            Only letters, spaces, and ~ allowed
           </div>
         </div>
       </div>
@@ -33,14 +33,14 @@
           type="text" 
           class="auth_input my-3" 
           placeholder="Last Name" 
-          name="lastName" 
-          [(ngModel)]="model.last_name"
-          required 
-          #lastName="ngModel"
-          [ngClass]="{'is-invalid': registerForm.submitted && lastName.invalid}">
-        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && lastName.invalid">
-          <div *ngIf="lastName.errors?.['required']">
+          formControlName="last_name"
+          [ngClass]="{'is-invalid': signupForm.touched && f.last_name.invalid}">
+        <div class="text-danger validation-messages" *ngIf="f.last_name.touched && f.last_name.invalid">
+          <div *ngIf="f.last_name.errors?.['required']">
             Last Name is required
+          </div>
+          <div *ngIf="f.last_name.errors?.['pattern']">
+            Only letters, spaces, and ~ allowed
           </div>
         </div>
       </div>
@@ -51,17 +51,13 @@
           type="email" 
           class="auth_input my-3" 
           placeholder="Email" 
-          name="email" 
-          [(ngModel)]="model.email" 
-          required 
-          email 
-          #email="ngModel"
-          [ngClass]="{'is-invalid': registerForm.submitted && email.invalid}">
-        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && email.invalid">
-          <div *ngIf="email.errors?.['required']">
+          formControlName="email"
+          [ngClass]="{'is-invalid': signupForm.touched && f.email.invalid}">
+        <div class="text-danger validation-messages" *ngIf="f.email.touched && f.email.invalid">
+          <div *ngIf="f.email.errors?.['required']">
             Email is required
           </div>
-          <div *ngIf="email.errors?.['email']">
+          <div *ngIf="f.email.errors?.['email']">
             Invalid Email Format
           </div>
         </div>
@@ -73,19 +69,14 @@
           type="text" 
           class="auth_input my-3" 
           placeholder="Phone Number (11 digits)" 
-          name="phone" 
-          [(ngModel)]="model.phone" 
-          required
-          pattern="[0-9]{11}"
+          formControlName="phone"
           maxlength="11"
-          (keypress)="validateNumberInput($event)"
-          #phone="ngModel"
-          [ngClass]="{'is-invalid': registerForm.submitted && phone.invalid}">
-        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && phone.invalid">
-          <div *ngIf="phone.errors?.['required']">
+          [ngClass]="{'is-invalid': signupForm.touched && f.phone.invalid}">
+        <div class="text-danger validation-messages" *ngIf="f.phone.touched && f.phone.invalid">
+          <div *ngIf="f.phone.errors?.['required']">
             Phone Number is required
           </div>
-          <div *ngIf="phone.errors?.['pattern']">
+          <div *ngIf="f.phone.errors?.['pattern']">
             Phone Number must be exactly 11 digits
           </div>
         </div>
@@ -97,22 +88,17 @@
           type="password" 
           class="auth_input my-3" 
           placeholder="Password" 
-          name="password" 
-          [(ngModel)]="model.password"
-          required 
-          minlength="8" 
-          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W]{8,}$"
-          #password="ngModel"
-          [ngClass]="{'is-invalid': registerForm.submitted && password.invalid}">
-        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && password.invalid">
-          <div *ngIf="password.errors?.['required']">
+          formControlName="password"
+          [ngClass]="{'is-invalid': signupForm.touched && f.password.invalid}">
+        <div class="text-danger validation-messages" *ngIf="f.password.touched && f.password.invalid">
+          <div *ngIf="f.password.errors?.['required']">
             Password is required
           </div>
-          <div *ngIf="password.errors?.['minlength']">
+          <div *ngIf="f.password.errors?.['minlength']">
             Password must be at least 8 characters
           </div>
-          <div *ngIf="password.errors?.['pattern']">
-            Password must contain at least one uppercase letter, one lowercase letter, and one number
+          <div *ngIf="f.password.errors?.['pattern']">
+            Password must contain at least one uppercase letter, one lowercase letter, one number, and may include ~
           </div>
         </div>
       </div>
@@ -123,17 +109,13 @@
           type="password" 
           class="auth_input my-3" 
           placeholder="Confirm Password" 
-          name="confirm_password"
-          [(ngModel)]="model.confirm_password" 
-          required 
-          [pattern]="model.password" 
-          #confirm_password="ngModel"
-          [ngClass]="{'is-invalid': registerForm.submitted && confirm_password.invalid}">
-        <div class="text-danger validation-messages" *ngIf="registerForm.submitted && confirm_password.invalid">
-          <div *ngIf="confirm_password.errors?.['required']">
+          formControlName="confirm_password"
+          [ngClass]="{'is-invalid': signupForm.touched && (f.confirm_password.invalid || signupForm.errors?.['mismatch'])}">
+        <div class="text-danger validation-messages" *ngIf="f.confirm_password.touched && (f.confirm_password.invalid || signupForm.errors?.['mismatch'])">
+          <div *ngIf="f.confirm_password.errors?.['required']">
             Confirmation is required
           </div>
-          <div *ngIf="confirm_password.errors?.['pattern']">
+          <div *ngIf="signupForm.errors?.['mismatch']">
             Passwords do not match
           </div>
         </div>

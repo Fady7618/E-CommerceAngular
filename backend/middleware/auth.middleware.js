@@ -1,51 +1,49 @@
-const { verifyToken } = require('../services/token.service');
+const jwt = require('jsonwebtoken');
+const { jwt: jwtConfig } = require('../config/keys');
 const User = require('../models/user.model');
+
+exports.verifyToken = (token) => {
+  try {
+    return jwt.verify(token, jwtConfig.secret);
+  } catch (err) {
+    return null;
+  }
+};
 
 /**
  * Middleware to protect routes - verifies JWT and attaches user to request
  */
 exports.protect = async (req, res, next) => {
   try {
-    // Get token from header
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
-    
+    console.log('Token:', token);
+
     if (!token) {
-      return res.status(401).json({
-        status: 'Error',
-        message: 'Not authorized to access this route'
-      });
+      return res.status(401).json({ status: 'Error', message: 'Not authorized to access this route' });
     }
-    
-    // Verify token
-    const decoded = verifyToken(token);
+
+    const decoded = exports.verifyToken(token);
+    console.log('Decoded:', decoded);
+
     if (!decoded) {
-      return res.status(401).json({
-        status: 'Error',
-        message: 'Invalid or expired token'
-      });
+      return res.status(401).json({ status: 'Error', message: 'Invalid or expired token' });
     }
-    
-    // Check if user exists
+
     const user = await User.findById(decoded.id).select('-password');
+    console.log('User:', user);
+
     if (!user) {
-      return res.status(401).json({
-        status: 'Error',
-        message: 'User not found'
-      });
+      return res.status(401).json({ status: 'Error', message: 'User not found' });
     }
-    
-    // Set user in request
+
     req.user = user;
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
-    return res.status(401).json({
-      status: 'Error',
-      message: 'Not authorized to access this route'
-    });
+    return res.status(401).json({ status: 'Error', message: 'Not authorized to access this route' });
   }
 };
 
