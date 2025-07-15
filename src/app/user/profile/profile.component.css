@@ -13,3 +13,10 @@ button:hover{
 .form-control{
   border-radius: 5px;
 }
+
+.profile-img {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #db4444;
+  /* margin-bottom: 10px; */
+}

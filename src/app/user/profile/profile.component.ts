@@ -1,15 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { GlobalService } from '../../Services/global.service';
 import { AuthService } from '../../Services/auth.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
-export class ProfileComponent {
+export class ProfileComponent implements OnDestroy {
 
   userData: any = '';
   userId: any;
@@ -17,20 +18,25 @@ export class ProfileComponent {
     first_name: '',
     last_name: '',
     email: '',
-    phone: ''
+    phone: '',
+    profile_image: ''
   };
   passwordModel = {
     current_password: '',
     new_password: '',
     confirm_password: ''
   };
+  defaultImage = '/images/default-profile.jpg';
+  userSubscription: Subscription;
+
   constructor(private auth: AuthService, private router: Router) {
-    this.auth.currentUser$.subscribe(user => {
+    this.userSubscription = this.auth.currentUser$.subscribe(user => {
       if (user) {
         this.model.first_name = user.first_name || user.customer_first_name || '';
         this.model.last_name = user.last_name || user.customer_last_name || '';
         this.model.email = user.email || user.customer_email || '';
         this.model.phone = user.phone || user.customer_phone || '';
+        this.model.profile_image = user.profile_image || '';
         this.userId = user._id || user.customer_id || '';
       }
     });
@@ -113,5 +119,19 @@ export class ProfileComponent {
     }
     
     return true;
+  }
+
+  getProfileImage(): string {
+    return this.model && this.model.profile_image
+      ? this.model.profile_image
+      : this.defaultImage;
+  }
+
+  handleImageError(event: any) {
+    event.target.src = this.defaultImage;
+  }
+
+  ngOnDestroy() {
+    this.userSubscription.unsubscribe();
   }
 }
