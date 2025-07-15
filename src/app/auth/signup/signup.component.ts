@@ -83,9 +83,18 @@ export class SignupComponent implements OnInit {
         (err) => {
           this.isLoading = false;
           this.cdr.detectChanges();
+          // Show the error message from backend or a generic message
+          let errorMsg = 'Registration failed. Please try again.';
+          if (err.error?.message) {
+            errorMsg = err.error.message;
+          } else if (err.message) {
+            errorMsg = err.message;
+          } else if (typeof err === 'string') {
+            errorMsg = err;
+          }
           Swal.fire({
             title: 'Error!',
-            text: err.error?.message || 'Registration failed. Please try again.',
+            text: errorMsg,
             icon: 'error',
             confirmButtonText: 'OK'
           });
