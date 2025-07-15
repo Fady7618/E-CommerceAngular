@@ -50,7 +50,8 @@ export class ProfileComponent implements OnDestroy {
             first_name: res.data.customer_first_name,
             last_name: res.data.customer_last_name,
             email: res.data.customer_email,
-            phone: res.data.customer_phone
+            phone: res.data.customer_phone,
+            profile_image: res.data.profile_image
           };
           
           localStorage.setItem('user', JSON.stringify(userData));
