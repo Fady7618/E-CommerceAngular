@@ -40,4 +40,11 @@ router.get('/profile', async (req, res) => {
  */
 router.put('/:id', userController.updateProfile);
 
+/**
+ * @route DELETE /api/users/me
+ * @desc Delete user account
+ * @access Private
+ */
+router.delete('/me', authMiddleware.protect, userController.deleteAccount);
+
 module.exports = router;

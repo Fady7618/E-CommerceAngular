@@ -57,7 +57,8 @@ app.use(passport.initialize());
 
 // Routes
 app.use('/api/auth', require('./routes/auth.routes'));
-app.use('/api/users', require('./routes/user.routes'));
+const userRoutes = require('./routes/user.routes');
+app.use('/api/users', userRoutes);
 // Add other routes as needed
 
 // Error handler middleware

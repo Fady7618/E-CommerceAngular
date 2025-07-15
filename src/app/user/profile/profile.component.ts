@@ -29,7 +29,11 @@ export class ProfileComponent implements OnDestroy {
   defaultImage = '/images/default-profile.jpg';
   userSubscription: Subscription;
 
-  constructor(private auth: AuthService, private router: Router) {
+  constructor(
+    private auth: AuthService,
+    private global: GlobalService, // <-- Add this!
+    private router: Router
+  ) {
     this.userSubscription = this.auth.currentUser$.subscribe(user => {
       if (user) {
         this.model.first_name = user.first_name || user.customer_first_name || '';
@@ -134,5 +138,39 @@ export class ProfileComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.userSubscription.unsubscribe();
+  }
+
+  deleteAccount() {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete your account? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.auth.deleteAccount().subscribe(
+          (res) => {
+            Swal.fire({
+              title: 'Deleted!',
+              text: 'Your account has been deleted.',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              this.auth.logout();
+              this.global.logout(); // <-- Add this line!
+              this.router.navigate(['/signup']);
+            });
+          },
+          (err) => {
+            Swal.fire('Error!', 'Failed to delete account.', 'error');
+          }
+        );
+      }
+    });
   }
 }

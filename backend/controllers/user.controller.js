@@ -27,3 +27,13 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ status: 'Error', message: error.message });
   }
 };
+
+// Delete user account
+exports.deleteAccount = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user._id);
+    res.json({ status: 'Success', message: 'Account deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ status: 'Error', message: error.message });
+  }
+};

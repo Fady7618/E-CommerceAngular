@@ -141,4 +141,8 @@ export class AuthService {
   public updateCurrentUser(user: any): void {
     this.currentUserSubject.next(user);
   }
+
+  deleteAccount(): Observable<any> {
+    return this.Http.delete(`${this.apiUrl}/users/me`);
+  }
 }
