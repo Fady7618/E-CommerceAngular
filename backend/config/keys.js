@@ -16,12 +16,12 @@ module.exports = {
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.NODE_ENV === 'production'
-      ? process.env.GOOGLE_CALLBACK_URL_PROD
-      : process.env.GOOGLE_CALLBACK_URL_DEV
+      ? process.env.GOOGLE_CALLBACK_URL_PRODUCTION
+      : process.env.GOOGLE_CALLBACK_URL
   },
   frontend: {
     url: process.env.NODE_ENV === 'production'
-      ? process.env.FRONTEND_URL_PROD
-      : process.env.FRONTEND_URL_DEV
+      ? process.env.FRONTEND_URL_PRODUCTION
+      : process.env.FRONTEND_URL
   }
 };

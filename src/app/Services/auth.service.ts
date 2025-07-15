@@ -133,7 +133,7 @@ export class AuthService {
   // Get Google auth URL - NEW
   getGoogleAuthUrl(): string {
     const googleClientId = environment.googleClientId;
-    const redirectUri = encodeURIComponent('http://localhost:4200/auth/callback');
+    const redirectUri = encodeURIComponent(window.location.origin + '/auth/callback');
     
     return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile&prompt=select_account`;
   }
