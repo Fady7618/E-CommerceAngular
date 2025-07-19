@@ -179,81 +179,73 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   addToCart(product: Product) {
-    if (this.globalService.is_login) { // Remove the "|| true" that was causing the issue
-      product.addingToCart = true;
-      
-      console.log('Adding product to cart:', product);
-      
-      const cartItem = {
-        product_id: product.id,
-        qty: 1,
-        name: product.name || product.title,
-        price: product.price,
-        price_after: product.price_after || product.price,
-        image: product.image || product.thumbnail,
-        brand: product.brand,
-        stock: product.stock
-      };
-      
-      console.log('Cart item structure:', cartItem);
-      
-      this.cartService.addToCart(cartItem).subscribe({
-        next: (res: any) => {
-          setTimeout(() => {
-            product.addingToCart = false;
-          }, 600);
+    product.addingToCart = true;
 
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-            background: '#28a745',
-            color: 'white',
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
+    const cartItem = {
+      product_id: product.id,
+      qty: 1,
+      name: product.name || product.title,
+      price: product.price,
+      price_after: product.price_after || product.price,
+      image: product.image || product.thumbnail,
+      brand: product.brand,
+      stock: product.stock
+    };
+
+    this.cartService.addToCart(cartItem).subscribe({
+      next: (res: any) => {
+        setTimeout(() => {
+          product.addingToCart = false;
+        }, 600);
+
+        if (res.message === 'You must be logged in to add items to cart.') {
+          Swal.fire({
+            title: 'Login Required',
+            text: 'Please login or create an account to add items to your cart.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Login',
+            cancelButtonText: 'Sign Up',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#28a745'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.router.navigate(['/login']);
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              this.router.navigate(['/signup']);
             }
           });
+          return;
+        }
 
-          Toast.fire({
-            icon: 'success',
-            title: `${product.name || product.title} added to cart!`
-          });
-        },
-        error: (err: any) => {
-          product.addingToCart = false;
-          Swal.fire({
-            title: 'Error!',
-            text: err.error?.message || 'Failed to add product to cart.',
-            icon: 'error',
-            timer: 2000,
-            showConfirmButton: false
-          });
-        }
-      });
-    } else {
-      // Show login/signup alert
-      Swal.fire({
-        title: 'Login Required',
-        text: 'Please login or create an account to add items to your cart',
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonText: 'Login',
-        cancelButtonText: 'Sign Up',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#28a745'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          // Navigate to login page
-          this.router.navigate(['/login']);
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          // Navigate to signup page
-          this.router.navigate(['/signup']);
-        }
-      });
-    }
+        // Success toast
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+          background: '#28a745',
+          color: 'white',
+          
+        });
+
+        Toast.fire({
+          icon: 'success',
+          title: `${product.name || product.title} added to cart!`
+        });
+      },
+      error: (err: any) => {
+        product.addingToCart = false;
+        Swal.fire({
+          title: 'Error!',
+          text: err.error?.message || 'Failed to add product to cart.',
+          icon: 'error',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
   }
 
   toggleWishlist(product: Product) {
@@ -290,7 +282,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   addToWishlist(product: Product) {
     product.addingToWishlist = true;
-    
+
     const wishlistItem = {
       product_id: product.id,
       name: product.name || product.title,
@@ -305,13 +297,32 @@ export class ProductsComponent implements OnInit, OnDestroy {
     };
 
     this.wishlistService.addToWishlist(wishlistItem).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         setTimeout(() => {
           product.addingToWishlist = false;
         }, 600);
 
-        this.loadWishlist();
+        if (res.message === 'You must be logged in to add items to wishlist.') {
+          Swal.fire({
+            title: 'Login Required',
+            text: 'Please login or create an account to add items to your wishlist.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Login',
+            cancelButtonText: 'Sign Up',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#28a745'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.router.navigate(['/login']);
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              this.router.navigate(['/signup']);
+            }
+          });
+          return;
+        }
 
+        // Success toast
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -320,10 +331,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
           timerProgressBar: true,
           background: '#28a745',
           color: 'white',
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-          }
+          
         });
 
         Toast.fire({
@@ -331,7 +339,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
           title: `${product.name || product.title} added to wishlist! 💖`
         });
       },
-      error: (err) => {
+      error: (err: any) => {
         product.addingToWishlist = false;
         Swal.fire({
           title: 'Error!',

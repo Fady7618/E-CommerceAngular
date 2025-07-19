@@ -41,6 +41,14 @@ exports.register = async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
+    // Set JWT as HTTP-only cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
     // Return user data and token
     res.status(201).json({
       status: 'Success',
@@ -50,8 +58,7 @@ exports.register = async (req, res) => {
         last_name: user.last_name,
         email: user.email,
         phone: user.phone,
-        profile_image: user.profile_image,
-        token
+        profile_image: user.profile_image
       }
     });
   } catch (error) {
@@ -85,6 +92,15 @@ exports.login = async (req, res) => {
     }
 
     const token = generateToken(user._id);
+
+    // Set JWT as HTTP-only cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
     res.json({
       status: 'Success',
       data: {
@@ -93,8 +109,7 @@ exports.login = async (req, res) => {
         last_name: user.last_name,
         email: user.email,
         phone: user.phone,
-        profile_image: user.profile_image,
-        token
+        profile_image: user.profile_image
       }
     });
   } catch (error) {
@@ -152,8 +167,15 @@ exports.googleAuth = async (req, res) => {
     
     // Generate token
     const token = generateToken(user._id);
-    
-    // Return user data and token
+
+    // Set JWT as HTTP-only cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
     res.json({
       status: 'Success',
       data: {
@@ -162,8 +184,7 @@ exports.googleAuth = async (req, res) => {
         last_name: user.last_name,
         email: user.email,
         phone: user.phone,
-        profile_image: user.profile_image,
-        token
+        profile_image: user.profile_image
       }
     });
   } catch (error) {
@@ -201,4 +222,16 @@ exports.getProfile = async (req, res) => {
       message: error.message
     });
   }
+};
+
+/**
+ * Logout user
+ */
+exports.logout = (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  });
+  res.json({ status: 'Success', message: 'Logged out successfully' });
 };

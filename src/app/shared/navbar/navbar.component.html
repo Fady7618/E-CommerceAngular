@@ -25,19 +25,19 @@
           <li class="nav-item mx-2">
             <a class="nav-link">About</a>
           </li>
-          <li class="nav-item mx-2" *ngIf="!global.is_login">
+          <li class="nav-item mx-2" *ngIf="!user">
             <a class="nav-link" routerLink="signup" routerLinkActive="active">Sign Up</a>
           </li>
-          <li class="nav-item mx-2" *ngIf="global.is_login">
+          <li class="nav-item mx-2" *ngIf="user">
             <a style="cursor: pointer;" class="nav-link" (click)="logout()">Logout</a>
           </li>
-          <li class="nav-item mx-1" *ngIf="global.is_login">
+          <li class="nav-item mx-1" *ngIf="user">
             <a routerLink="profile" routerLinkActive="active"><i class="fa-solid fa-user"></i></a>
           </li>
-          <li class="nav-item mx-1" *ngIf="global.is_login">
+          <li class="nav-item mx-1" *ngIf="user">
             <a routerLink="cart" routerLinkActive="active"><i class="fa-solid fa-cart-shopping"></i></a>
           </li>
-          <li class="nav-item mx-1" *ngIf="global.is_login">
+          <li class="nav-item mx-1" *ngIf="user">
             <a routerLink="wishlist" routerLinkActive="active"><i class="fa-solid fa-heart"></i></a>
           </li>
         </ul>

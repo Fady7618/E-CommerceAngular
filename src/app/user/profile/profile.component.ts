@@ -31,7 +31,7 @@ export class ProfileComponent implements OnDestroy {
 
   constructor(
     private auth: AuthService,
-    private global: GlobalService, // <-- Add this!
+    private global: GlobalService,
     private router: Router
   ) {
     this.userSubscription = this.auth.currentUser$.subscribe(user => {
@@ -45,22 +45,17 @@ export class ProfileComponent implements OnDestroy {
       }
     });
   }
+
   handleSubmit(registerForm: any) {
     if (registerForm.valid) {
       this.auth.updateProfile(this.model, this.userId).subscribe(
         (res) => {
-          // Update localStorage with new user data
-          const userData = {
-            first_name: res.data.customer_first_name,
-            last_name: res.data.customer_last_name,
-            email: res.data.customer_email,
-            phone: res.data.customer_phone,
-            profile_image: res.data.profile_image
-          };
-          
-          localStorage.setItem('user', JSON.stringify(userData));
-          localStorage.setItem('user_name', res.data.customer_first_name);
-          this.auth.updateCurrentUser(userData);
+          // Fetch the updated user from the backend and update the app state
+          this.auth.getProfile().subscribe(profileRes => {
+            if (profileRes && profileRes.data) {
+              this.auth.updateCurrentUser(profileRes.data);
+            }
+          });
           Swal.fire({
             title: 'Success!',
             text: 'Update Profile Successfully.',
@@ -80,6 +75,7 @@ export class ProfileComponent implements OnDestroy {
       );
     }
   }
+
   handlePasswordChange(passwordForm: any) {
     if (passwordForm.valid) {
       this.auth.changePassword(this.passwordModel).subscribe(
@@ -111,18 +107,14 @@ export class ProfileComponent implements OnDestroy {
   validateNumberInput(event: any): boolean {
     const pattern = /^[0-9]$/;
     const inputChar = String.fromCharCode(event.charCode);
-    
-    // Allow special keys like backspace, delete, arrows, etc.
+
     if (event.charCode === 0) {
       return true;
     }
-    
-    // Only allow digit characters
     if (!pattern.test(inputChar)) {
       event.preventDefault();
       return false;
     }
-    
     return true;
   }
 
@@ -162,8 +154,7 @@ export class ProfileComponent implements OnDestroy {
               showConfirmButton: false
             }).then(() => {
               this.auth.logout();
-              this.global.logout(); // <-- Add this line!
-              this.router.navigate(['/signup']);
+              this.router.navigate(['/']); // Redirect to home
             });
           },
           (err) => {

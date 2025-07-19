@@ -16,8 +16,13 @@ exports.verifyToken = (token) => {
 exports.protect = async (req, res, next) => {
   try {
     let token;
+    // Check Authorization header first
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
+    }
+    // Fallback to cookie
+    if (!token && req.cookies && req.cookies.token) {
+      token = req.cookies.token;
     }
     console.log('Token:', token);
 

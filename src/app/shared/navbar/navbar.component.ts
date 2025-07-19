@@ -13,7 +13,6 @@ export class NavbarComponent implements OnInit {
   user: any; // Define the user property
 
   constructor(
-    public global: GlobalService,
     private router: Router,
     private auth: AuthService // Inject AuthService
   ) {}
@@ -26,12 +25,7 @@ export class NavbarComponent implements OnInit {
   }
 
   logout() {
-    localStorage.removeItem('user_name');
-    localStorage.removeItem('user_token');
-    localStorage.removeItem('user');
-
-    this.global.logout(); // Use the new method
-
+    this.auth.logout();
     Swal.fire({
       title: 'Success!',
       text: 'Logout Successfully.',

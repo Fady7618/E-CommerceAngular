@@ -58,8 +58,7 @@ export class LoginComponent {
       this.auth.login(this.loginForm.value).subscribe(
         (res) => {
           this.isLoading = false;
-          if (res && res.data && res.data.token) {
-            localStorage.setItem('user_token', res.data.token);
+          if (res && res.data) {
             localStorage.setItem('user', JSON.stringify(res.data));
             this.auth.updateCurrentUser(res.data);
             this.global.login(res.data.first_name);

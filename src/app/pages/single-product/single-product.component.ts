@@ -28,16 +28,10 @@ export class SingleProductComponent implements OnInit, OnDestroy {
     { value: '#0000ff', name: 'Blue' }
   ];
   selectedSize: string = '';
-  
-  // Animation flags
   addingToCart: boolean = false;
   addingToWishlist: boolean = false;
   wishlistItems: any[] = [];
-  
-  // Authentication subscription
   private authSubscription: Subscription;
-
-  // Add a property to track cart items
   cartItems: any[] = [];
 
   constructor(
@@ -48,16 +42,13 @@ export class SingleProductComponent implements OnInit, OnDestroy {
     private globalService: GlobalService,
     private wishlistService: WishlistService
   ) {
-    // Subscribe to authentication state changes
     this.authSubscription = this.globalService.loginState$.subscribe(isLoggedIn => {
       if (!isLoggedIn) {
-        // Clear wishlist items when user logs out
         this.wishlistItems = [];
-        this.cartItems = []; // Clear cart items too
+        this.cartItems = [];
       } else {
-        // Reload wishlist and cart when user logs in
         this.loadWishlist();
-        this.loadCart(); // Load cart when user logs in
+        this.loadCart();
       }
     });
   }
@@ -67,14 +58,12 @@ export class SingleProductComponent implements OnInit, OnDestroy {
       this.productId = parseInt(params['id']);
       if (this.productId) {
         this.loadProduct();
-        
-        // Only load wishlist and cart if user is logged in
         if (this.globalService.is_login) {
           this.loadWishlist();
-          this.loadCart(); // Add this to load cart data
+          this.loadCart();
         } else {
-          this.wishlistItems = []; 
-          this.cartItems = []; // Clear cart items when not logged in
+          this.wishlistItems = [];
+          this.cartItems = [];
         }
       } else {
         this.router.navigate(['/404']);
@@ -83,7 +72,6 @@ export class SingleProductComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Clean up subscription to prevent memory leaks
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }
@@ -93,12 +81,7 @@ export class SingleProductComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.productService.getProductById(this.productId).subscribe({
       next: (product: Product) => {
-        console.log('Raw product from API:', product);
-        
-        // Calculate discounted price
         const discountedPrice = product.price * (1 - product.discountPercentage / 100);
-        
-        // Normalize the product data for DummyJSON API
         this.product = {
           ...product,
           name: product.title,
@@ -110,17 +93,13 @@ export class SingleProductComponent implements OnInit, OnDestroy {
           },
           gallery: product.images?.map(img => ({ name: img })) || [{ name: product.thumbnail }]
         };
-        
         this.main_image = product.thumbnail || product.images?.[0] || '';
         this.sizes = ['S', 'M', 'L', 'XL'];
         this.loading = false;
         this.loadRelatedProducts();
-        console.log('Processed product:', this.product);
       },
       error: (err: any) => {
-        console.error('Error loading product:', err);
         this.loading = false;
-        
         Swal.fire({
           title: 'Product Not Found',
           text: 'The product you are looking for does not exist.',
@@ -183,10 +162,9 @@ export class SingleProductComponent implements OnInit, OnDestroy {
 
   addToCart() {
     if (!this.globalService.is_login) {
-      // User is not logged in, show alert
       Swal.fire({
         title: 'Login Required',
-        text: 'Please login or create an account to add items to your cart',
+        text: 'Please login or create an account to add items to your cart.',
         icon: 'info',
         showCancelButton: true,
         confirmButtonText: 'Login',
@@ -195,20 +173,18 @@ export class SingleProductComponent implements OnInit, OnDestroy {
         cancelButtonColor: '#28a745'
       }).then((result) => {
         if (result.isConfirmed) {
-          // Navigate to login page
           this.router.navigate(['/login']);
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          // Navigate to signup page
           this.router.navigate(['/signup']);
         }
       });
       return;
     }
-    
+
     if (!this.product) return;
-    
+
     this.addingToCart = true;
-    
+
     const cartItem = {
       product_id: this.product.id,
       name: this.product.name || this.product.title,
@@ -218,15 +194,35 @@ export class SingleProductComponent implements OnInit, OnDestroy {
       qty: this.quantity,
       size: this.selectedSize || '',
     };
-    
+
     this.cartService.addToCart(cartItem).subscribe({
       next: (res) => {
         setTimeout(() => {
           this.addingToCart = false;
         }, 600);
 
+        if (res.message === 'You must be logged in to add items to cart.') {
+          Swal.fire({
+            title: 'Login Required',
+            text: 'Please login or create an account to add items to your cart.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Login',
+            cancelButtonText: 'Sign Up',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#28a745'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.router.navigate(['/login']);
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              this.router.navigate(['/signup']);
+            }
+          });
+          return;
+        }
+
         this.loadCart();
-        
+
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -258,13 +254,12 @@ export class SingleProductComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   toggleWishlist() {
     if (!this.globalService.is_login) {
-      // User is not logged in, show alert
       Swal.fire({
         title: 'Login Required',
-        text: 'Please login or create an account to add items to your wishlist',
+        text: 'Please login or create an account to add items to your wishlist.',
         icon: 'info',
         showCancelButton: true,
         confirmButtonText: 'Login',
@@ -273,32 +268,30 @@ export class SingleProductComponent implements OnInit, OnDestroy {
         cancelButtonColor: '#28a745'
       }).then((result) => {
         if (result.isConfirmed) {
-          // Navigate to login page
           this.router.navigate(['/login']);
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          // Navigate to signup page
           this.router.navigate(['/signup']);
         }
       });
       return;
     }
-    
+
     if (!this.product) return;
-    
+
     const isInWishlist = this.isInWishlist(this.product.id);
-    
+
     if (isInWishlist) {
       this.removeFromWishlist();
     } else {
       this.addToWishlist();
     }
   }
-  
+
   addToWishlist() {
     if (!this.product) return;
-    
+
     this.addingToWishlist = true;
-    
+
     const wishlistItem = {
       product_id: this.product.id,
       name: this.product.name || this.product.title,
@@ -309,15 +302,35 @@ export class SingleProductComponent implements OnInit, OnDestroy {
       category: this.product.category,
       brand: this.product.brand
     };
-    
+
     this.wishlistService.addToWishlist(wishlistItem).subscribe({
       next: (res) => {
         setTimeout(() => {
           this.addingToWishlist = false;
         }, 600);
-        
+
+        if (res.message === 'You must be logged in to add items to wishlist.') {
+          Swal.fire({
+            title: 'Login Required',
+            text: 'Please login or create an account to add items to your wishlist.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Login',
+            cancelButtonText: 'Sign Up',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#28a745'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.router.navigate(['/login']);
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              this.router.navigate(['/signup']);
+            }
+          });
+          return;
+        }
+
         this.loadWishlist();
-        
+
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -349,11 +362,11 @@ export class SingleProductComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   removeFromWishlist() {
     if (!this.product) return;
-    
-    const wishlistItem = this.wishlistItems.find(item => 
+
+    const wishlistItem = this.wishlistItems.find(item =>
       (item.product_id || item.id) === this.product?.id
     );
 
@@ -383,7 +396,7 @@ export class SingleProductComponent implements OnInit, OnDestroy {
       });
     }
   }
-  
+
   loadWishlist() {
     this.wishlistService.getWishlist().subscribe({
       next: (res) => {
@@ -395,17 +408,13 @@ export class SingleProductComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Add this method to the SingleProductComponent class
   isInCart(productId: number): boolean {
-    // Check if the product exists in cart items
     if (!productId || !this.cartItems || !this.cartItems.length) return false;
-    
-    return this.cartItems.some(item => 
+    return this.cartItems.some(item =>
       (item.product_id === productId) || (item.id === productId)
     );
   }
 
-  // Update the loadCart method to fetch cart items
   loadCart() {
     this.cartService.getCart().subscribe({
       next: (res) => {
@@ -418,12 +427,11 @@ export class SingleProductComponent implements OnInit, OnDestroy {
   }
 
   isInWishlist(productId: number): boolean {
-    return this.wishlistItems.some(item => 
+    return this.wishlistItems.some(item =>
       (item.product_id || item.id) === productId
     );
   }
 
-  // Handle image errors
   handleImageError(event: Event): void {
     const imgElement = event.target as HTMLImageElement;
     imgElement.src = 'https://via.placeholder.com/300x300?text=No+Image';

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from './auth.service'; // <-- Import AuthService
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,10 @@ export class CartService {
   private cart: any[] = [];
   private _cartUpdateSubject = new Subject<boolean>();
 
-  constructor(private Http: HttpClient) { 
+  constructor(
+    private Http: HttpClient,
+    private auth: AuthService // <-- Inject AuthService
+  ) { 
     // Load cart from localStorage on service initialization
     const savedCart = localStorage.getItem('cart_items');
     if (savedCart) {
@@ -31,6 +35,11 @@ export class CartService {
   }
 
   addToCart(item: any): Observable<any> {
+    // Prevent adding to cart if not authenticated
+    if (!this.auth.isAuthenticated) {
+      return of({ message: 'You must be logged in to add items to cart.' });
+    }
+
     console.log('CartService: Received item:', item);
     
     // Check if product already exists in cart
