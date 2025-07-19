@@ -16,7 +16,9 @@
           class="auth_input my-3" 
           placeholder="First Name" 
           formControlName="first_name"
-          [ngClass]="{'is-invalid': signupForm.touched && f.first_name.invalid}">
+          [ngClass]="{'is-invalid': signupForm.touched && f.first_name.invalid, 'is-valid': f.first_name.touched && f.first_name.valid}">
+        <!-- Green checkmark -->
+        <span *ngIf="f.first_name.touched && f.first_name.valid" class="valid-check">&#10003;</span>
         <div class="text-danger validation-messages" *ngIf="f.first_name.touched && f.first_name.invalid">
           <div *ngIf="f.first_name.errors?.['required']">
             First Name is required
@@ -34,7 +36,8 @@
           class="auth_input my-3" 
           placeholder="Last Name" 
           formControlName="last_name"
-          [ngClass]="{'is-invalid': signupForm.touched && f.last_name.invalid}">
+          [ngClass]="{'is-invalid': signupForm.touched && f.last_name.invalid, 'is-valid': f.last_name.touched && f.last_name.valid}">
+        <span *ngIf="f.last_name.touched && f.last_name.valid" class="valid-check">&#10003;</span>
         <div class="text-danger validation-messages" *ngIf="f.last_name.touched && f.last_name.invalid">
           <div *ngIf="f.last_name.errors?.['required']">
             Last Name is required
@@ -52,7 +55,8 @@
           class="auth_input my-3" 
           placeholder="Email" 
           formControlName="email"
-          [ngClass]="{'is-invalid': signupForm.touched && f.email.invalid}">
+          [ngClass]="{'is-invalid': signupForm.touched && f.email.invalid, 'is-valid': f.email.touched && f.email.valid}">
+        <span *ngIf="f.email.touched && f.email.valid" class="valid-check">&#10003;</span>
         <div class="text-danger validation-messages" *ngIf="f.email.touched && f.email.invalid">
           <div *ngIf="f.email.errors?.['required']">
             Email is required
@@ -66,12 +70,14 @@
       <!-- Phone Number field -->
       <div class="form-group position-relative">
         <input 
-          type="text" 
+          type="tel" 
           class="auth_input my-3" 
           placeholder="Phone Number (11 digits)" 
           formControlName="phone"
           maxlength="11"
-          [ngClass]="{'is-invalid': signupForm.touched && f.phone.invalid}">
+          [ngClass]="{'is-invalid': signupForm.touched && f.phone.invalid, 'is-valid': f.phone.touched && f.phone.valid}"
+          (input)="onPhoneInput($event)">
+        <span *ngIf="f.phone.touched && f.phone.valid" class="valid-check">&#10003;</span>
         <div class="text-danger validation-messages" *ngIf="f.phone.touched && f.phone.invalid">
           <div *ngIf="f.phone.errors?.['required']">
             Phone Number is required
@@ -89,7 +95,11 @@
           class="auth_input my-3" 
           placeholder="Password" 
           formControlName="password"
-          [ngClass]="{'is-invalid': signupForm.touched && f.password.invalid}">
+          (input)="onPasswordInput()"
+          (focus)="passwordFocused = true"
+          (blur)="passwordFocused = false"
+          [ngClass]="{'is-invalid': signupForm.touched && f.password.invalid, 'is-valid': f.password.touched && f.password.valid}">
+        <span *ngIf="f.password.touched && f.password.valid" class="valid-check">&#10003;</span>
         <div class="text-danger validation-messages" *ngIf="f.password.touched && f.password.invalid">
           <div *ngIf="f.password.errors?.['required']">
             Password is required
@@ -101,6 +111,21 @@
             Password must contain at least one uppercase letter, one lowercase letter, one number, and may include ~
           </div>
         </div>
+
+        <div *ngIf="passwordFocused" class="password-strength-container">
+        <!-- Password Strength Progress Bar -->
+        <div class="password-strength-bar my-2">
+          <div [style.width.%]="passwordStrength * 25" [ngClass]="getStrengthClass()" class="strength-progress"></div>
+        </div>
+        <!-- Password Checklist -->
+        <ul class="password-checklist">
+          <li [class.valid]="passwordChecks.length">&#10003; At least 8 characters</li>
+          <li [class.valid]="passwordChecks.upper">&#10003; Uppercase letter</li>
+          <li [class.valid]="passwordChecks.lower">&#10003; Lowercase letter</li>
+          <li [class.valid]="passwordChecks.number">&#10003; Number</li>
+          <li [class.valid]="passwordChecks.special">&#10003; Special character (~!&#64;#$...)</li>
+        </ul>
+      </div>
       </div>
       
       <!-- Confirm Password field -->
@@ -110,7 +135,8 @@
           class="auth_input my-3" 
           placeholder="Confirm Password" 
           formControlName="confirm_password"
-          [ngClass]="{'is-invalid': signupForm.touched && (f.confirm_password.invalid || signupForm.errors?.['mismatch'])}">
+          [ngClass]="{'is-invalid': signupForm.touched && (f.confirm_password.invalid || signupForm.errors?.['mismatch']), 'is-valid': f.confirm_password.touched && f.confirm_password.valid && !signupForm.errors?.['mismatch']}">
+        <span *ngIf="f.confirm_password.touched && f.confirm_password.valid && !signupForm.errors?.['mismatch']" class="valid-check">&#10003;</span>
         <div class="text-danger validation-messages" *ngIf="f.confirm_password.touched && (f.confirm_password.invalid || signupForm.errors?.['mismatch'])">
           <div *ngIf="f.confirm_password.errors?.['required']">
             Confirmation is required
@@ -145,4 +171,6 @@
       <a routerLink="/login" class="text-black">Log in</a>
     </div>
   </div>
+
+  
 </div>

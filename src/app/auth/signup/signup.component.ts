@@ -18,6 +18,16 @@ export class SignupComponent implements OnInit {
   phonePattern = /^[0-9]{11}$/;
   passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d~!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}$/;
 
+  passwordStrength = 0;
+  passwordChecks = {
+    length: false,
+    upper: false,
+    lower: false,
+    number: false,
+    special: false
+  };
+  passwordFocused = false;
+
   constructor(
     private global: GlobalService,
     private auth: AuthService,
@@ -113,5 +123,32 @@ export class SignupComponent implements OnInit {
 
   signupWithGoogle(): void {
     window.location.href = this.auth.getGoogleAuthUrl();
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    input.value = input.value.replace(/[^0-9]/g, '');
+    this.signupForm.get('phone')?.setValue(input.value, { emitEvent: false });
+  }
+
+  onPasswordInput(): void {
+    const value = this.signupForm.get('password')?.value || '';
+    this.passwordChecks.length = value.length >= 8;
+    this.passwordChecks.upper = /[A-Z]/.test(value);
+    this.passwordChecks.lower = /[a-z]/.test(value);
+    this.passwordChecks.number = /\d/.test(value);
+    this.passwordChecks.special = /[~!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value);
+
+    // Count how many checks are true
+    this.passwordStrength = Object.values(this.passwordChecks).filter(Boolean).length;
+  }
+
+  getStrengthClass(): string {
+    switch (this.passwordStrength) {
+      case 5: return 'strong';
+      case 4: return 'medium';
+      case 3: return 'weak';
+      default: return 'very-weak';
+    }
   }
 }

@@ -39,3 +39,48 @@ button:hover{
   color: #fff;
   transition: all 0.2s;
 }
+.is-valid {
+  border-bottom: 2px solid #28a745 !important;
+}
+.valid-check {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-60%);
+  color: #28a745;
+  font-size: 1.2em;
+  pointer-events: none;
+}
+.password-strength-bar {
+  width: 100%;
+  height: 8px;
+  background: #eee;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+.strength-progress {
+  height: 100%;
+  transition: width 0.3s;
+  border-radius: 4px;
+}
+.strength-progress.very-weak { background: #dc3545; }
+.strength-progress.weak { background: #fd7e14; }
+.strength-progress.medium { background: #ffc107; }
+.strength-progress.strong { background: #28a745; }
+
+.password-checklist {
+  list-style: none;
+  padding-left: 0;
+  margin: 0 0 0 2px;
+  font-size: 0.95em;
+}
+.password-checklist li {
+  color: #dc3545;
+  margin-bottom: 2px;
+  transition: color 0.2s;
+}
+.password-checklist li.valid {
+  color: #28a745;
+  font-weight: 500;
+}
