@@ -4,7 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const passport = require('passport');
 const path = require('path');
-const cookieParser = require('cookie-parser'); // <-- Add this
+const cookieParser = require('cookie-parser');
 
 // Load environment variables
 dotenv.config();
@@ -38,18 +38,10 @@ mongoose.connect(MONGO_URI)
 
 // Middleware
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true
 }));
-app.use(cookieParser()); // <-- Add this
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -61,7 +53,6 @@ app.use(passport.initialize());
 app.use('/api/auth', require('./routes/auth.routes'));
 const userRoutes = require('./routes/user.routes');
 app.use('/api/users', userRoutes);
-// Add other routes as needed
 
 // Error handler middleware
 app.use((err, req, res, next) => {

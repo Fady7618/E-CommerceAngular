@@ -3,7 +3,6 @@ const { generateToken } = require('../services/token.service');
 const { OAuth2Client } = require('google-auth-library');
 const axios = require('axios');
 
-// Create OAuth client
 const oAuth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
@@ -11,6 +10,15 @@ const oAuth2Client = new OAuth2Client(
     ? process.env.GOOGLE_CALLBACK_URL_PRODUCTION
     : process.env.GOOGLE_CALLBACK_URL
 );
+
+function getCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  };
+}
 
 /**
  * Register a new user with email and password
@@ -42,12 +50,7 @@ exports.register = async (req, res) => {
     const token = generateToken(user._id);
 
     // Set JWT as HTTP-only cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('token', token, getCookieOptions());
 
     // Return user data and token
     res.status(201).json({
@@ -94,12 +97,7 @@ exports.login = async (req, res) => {
     const token = generateToken(user._id);
 
     // Set JWT as HTTP-only cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('token', token, getCookieOptions());
 
     res.json({
       status: 'Success',
@@ -169,12 +167,7 @@ exports.googleAuth = async (req, res) => {
     const token = generateToken(user._id);
 
     // Set JWT as HTTP-only cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
+    res.cookie('token', token, getCookieOptions());
 
     res.json({
       status: 'Success',
@@ -231,7 +224,7 @@ exports.logout = (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   });
   res.json({ status: 'Success', message: 'Logged out successfully' });
 };
