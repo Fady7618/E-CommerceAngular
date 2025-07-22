@@ -7,7 +7,10 @@
             *ngFor="let image of product?.gallery; let i = index">
             <img 
               src="{{ image.name }}" 
-              alt="Product Image" 
+              alt="Product Image"
+              width="400"
+              height="400"
+              (error)="handleImageError($event)"
               loading="lazy">
           </a>
         </div>
@@ -15,7 +18,10 @@
           <div class="img h-100">
             <img 
               src="{{ main_image }}" 
-              alt="Product Image" 
+              alt="Product Image"
+              width="400"
+              height="400"
+              (error)="handleImageError($event)"
               loading="lazy">
           </div>
         </div>
@@ -135,6 +141,8 @@
             <img [src]="item.image" 
                  class="card-img-top position-relative border-bottom bg-body-secondary" 
                  alt="Product Image"
+                 width="300"
+                 height="300"
                  (error)="handleImageError($event)"
                  loading="lazy">
           </div>

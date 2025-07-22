@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const passport = require('passport');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +45,7 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(compression());
 
 // Initialize Passport
 require('./config/passport-setup')();
