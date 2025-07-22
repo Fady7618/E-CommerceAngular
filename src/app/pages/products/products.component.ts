@@ -17,10 +17,16 @@ export class ProductsComponent implements OnInit, OnDestroy {
   products: Product[] = [];
   categoryName: string = '';
   loading = false;
+  loadingMore = false;
   showGoUpButton: boolean = false;
   wishlistItems: any[] = [];
-  cartItems: any[] = []; // Add this property at the class level with your other properties
+  cartItems: any[] = [];
   private authSubscription: Subscription;
+
+  // Pagination state
+  page = 1;
+  limit = 20;
+  totalProducts = 0;
 
   // Default placeholder image
   defaultImage = 'https://via.placeholder.com/300x300?text=No+Image';
@@ -32,26 +38,24 @@ export class ProductsComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private wishlistService: WishlistService,
     private globalService: GlobalService
-  ) {
-    // Remove the subscription from here since we're already handling it in ngOnInit
-  }
+  ) {}
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.categoryName = params['name'];
+      this.page = 1;
+      this.products = [];
       this.loadProducts();
     });
-    
-    // Initial data loading based on login state
+
     if (this.globalService.is_login) {
       this.loadWishlist();
       this.loadCart();
     } else {
-      this.wishlistItems = []; 
+      this.wishlistItems = [];
       this.cartItems = [];
     }
 
-    // Subscribe to login state changes
     this.authSubscription = this.globalService.loginState$.subscribe(isLoggedIn => {
       if (isLoggedIn) {
         this.loadWishlist();
@@ -66,51 +70,43 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Clean up subscription to prevent memory leaks
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }
-
     window.removeEventListener('scroll', this.handleScroll.bind(this));
   }
 
-  loadProducts() {
-    this.loading = true;
-    if (this.categoryName) {
-      // Convert URL-friendly category name back to API format
-      const apiCategoryName = this.convertCategoryName(this.categoryName);
-      console.log('Loading category:', apiCategoryName);
-      
-      this.productService.getProductsByCategory(apiCategoryName).subscribe({
-        next: (res: any) => {
-          this.products = (res.data || []).map((product: Product) => this.normalizeProduct(product));
-          this.loading = false;
-          console.log('Products loaded by category:', this.products);
-        },
-        error: (err: any) => {
-          console.error('Error loading products:', err);
-          this.products = [];
-          this.loading = false;
-        }
-      });
+  loadProducts(loadMore = false) {
+    if (loadMore) {
+      this.loadingMore = true;
     } else {
-      // Load all products
-      this.productService.getAllProducts().subscribe({
-        next: (res: any) => {
-          this.products = (res.data || []).map((product: Product) => this.normalizeProduct(product));
-          this.loading = false;
-          console.log('All products loaded:', this.products);
-        },
-        error: (err: any) => {
-          console.error('Error loading products:', err);
-          this.products = [];
-          this.loading = false;
-        }
-      });
+      this.loading = true;
     }
+    const serviceCall = this.categoryName
+      ? this.productService.getProductsByCategory(this.convertCategoryName(this.categoryName), this.page, this.limit)
+      : this.productService.getAllProducts(this.page, this.limit);
+
+    serviceCall.subscribe({
+      next: (res: any) => {
+        const newProducts = (res.data || []).map((product: Product) => this.normalizeProduct(product));
+        this.products = loadMore ? [...this.products, ...newProducts] : newProducts;
+        this.totalProducts = res.total || this.products.length;
+        this.loading = false;
+        this.loadingMore = false;
+      },
+      error: (err: any) => {
+        this.products = [];
+        this.loading = false;
+        this.loadingMore = false;
+      }
+    });
   }
 
-  // Convert URL-friendly category names to API format
+  onLoadMore() {
+    this.page++;
+    this.loadProducts(true);
+  }
+
   convertCategoryName(categoryName: string): string {
     const categoryMap: { [key: string]: string } = {
       'beauty': 'beauty',
@@ -138,20 +134,17 @@ export class ProductsComponent implements OnInit, OnDestroy {
       'womens-shoes': 'womens-shoes',
       'womens-watches': 'womens-watches'
     };
-    
-    return categoryMap[categoryName.toLowerCase()] || categoryName;
+    return categoryMap[categoryName?.toLowerCase()] || categoryName;
   }
 
-  // Normalize product data from DummyJSON API
   normalizeProduct(product: Product): Product {
     const discountedPrice = product.price * (1 - product.discountPercentage / 100);
-    
     return {
       ...product,
       name: product.title,
-      price_after: parseFloat(discountedPrice.toFixed(2)), // Calculate discounted price
-      price: parseFloat(product.price.toString()), // Original price
-      image: product.thumbnail || product.images[0] || ''
+      price_after: parseFloat(discountedPrice.toFixed(2)),
+      price: parseFloat(product.price.toString()),
+      image: product.thumbnail || (product.images && product.images[0]) || ''
     };
   }
 
@@ -166,7 +159,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Add this method to load cart items
   loadCart() {
     this.cartService.getCart().subscribe({
       next: (res) => {
@@ -180,7 +172,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   addToCart(product: Product) {
     product.addingToCart = true;
-
     const cartItem = {
       product_id: product.id,
       qty: 1,
@@ -191,7 +182,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
       brand: product.brand,
       stock: product.stock
     };
-
     this.cartService.addToCart(cartItem).subscribe({
       next: (res: any) => {
         setTimeout(() => {
@@ -218,7 +208,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // Success toast
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -227,7 +216,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
           timerProgressBar: true,
           background: '#28a745',
           color: 'white',
-          
         });
 
         Toast.fire({
@@ -249,16 +237,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   toggleWishlist(product: Product) {
-    if (this.globalService.is_login) { // Remove the "|| true" that was causing the issue
+    if (this.globalService.is_login) {
       const isInWishlist = this.isInWishlist(product.id);
-      
       if (isInWishlist) {
         this.removeFromWishlist(product);
       } else {
         this.addToWishlist(product);
       }
     } else {
-      // Show login/signup alert
       Swal.fire({
         title: 'Login Required',
         text: 'Please login or create an account to add items to your wishlist',
@@ -270,10 +256,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
         cancelButtonColor: '#28a745'
       }).then((result) => {
         if (result.isConfirmed) {
-          // Navigate to login page
           this.router.navigate(['/login']);
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          // Navigate to signup page
           this.router.navigate(['/signup']);
         }
       });
@@ -282,7 +266,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   addToWishlist(product: Product) {
     product.addingToWishlist = true;
-
     const wishlistItem = {
       product_id: product.id,
       name: product.name || product.title,
@@ -295,7 +278,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
       rating: product.rating,
       stock: product.stock
     };
-
     this.wishlistService.addToWishlist(wishlistItem).subscribe({
       next: (res: any) => {
         setTimeout(() => {
@@ -322,7 +304,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
           return;
         }
 
-        // Success toast
         const Toast = Swal.mixin({
           toast: true,
           position: 'top-end',
@@ -331,7 +312,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
           timerProgressBar: true,
           background: '#28a745',
           color: 'white',
-          
         });
 
         Toast.fire({
@@ -353,15 +333,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   removeFromWishlist(product: Product) {
-    const wishlistItem = this.wishlistItems.find(item => 
+    const wishlistItem = this.wishlistItems.find(item =>
       (item.product_id || item.id) === product.id
     );
-
     if (wishlistItem) {
       this.wishlistService.removeFromWishlist(wishlistItem.id || wishlistItem.wishlist_id).subscribe({
         next: (res) => {
           this.loadWishlist();
-
           const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -371,7 +349,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
             background: '#6c757d',
             color: 'white'
           });
-
           Toast.fire({
             icon: 'info',
             title: `${product.name || product.title} removed from wishlist`
@@ -385,48 +362,42 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   isInWishlist(productId: number): boolean {
-    return this.wishlistItems.some(item => 
+    return this.wishlistItems.some(item =>
       (item.product_id || item.id) === productId
     );
   }
 
-  // Add the isInCart method that your template is trying to call
   isInCart(productId: number): boolean {
     if (!productId || !this.cartItems || !this.cartItems.length) return false;
-    
-    return this.cartItems.some(item => 
+    return this.cartItems.some(item =>
       (item.product_id === productId) || (item.id === productId)
     );
   }
 
-  // Helper method to get stock status
   getStockStatus(product: Product): string {
     if (product.stock <= 0) return 'Out of Stock';
     if (product.stock <= 10) return 'Low Stock';
     return 'In Stock';
   }
 
-  // Helper method to get stock status color
   getStockStatusColor(product: Product): string {
     if (product.stock <= 0) return 'text-danger';
     if (product.stock <= 10) return 'text-warning';
     return 'text-success';
   }
 
-  // Image error handler with proper TypeScript typing
   handleImageError(event: Event): void {
     const target = event.target as HTMLImageElement;
     if (target) {
       target.src = this.defaultImage;
-      target.onerror = null; // Prevent infinite loop
+      target.onerror = null;
     }
   }
-  // Add these new methods
+
   handleScroll() {
-    // Show button when user scrolls down 500px
     this.showGoUpButton = window.scrollY > 500;
   }
-  
+
   scrollToTop() {
     window.scrollTo({
       top: 0,

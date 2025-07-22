@@ -5,12 +5,18 @@
         <div class="product__details__pic__left product__thumb">
           <a class="pt" [class.active]="activeImageIndex === i" (click)="changeImage(i, image.name)"
             *ngFor="let image of product?.gallery; let i = index">
-            <img src="{{ image.name }}" alt="Product Image">
+            <img 
+              src="{{ image.name }}" 
+              alt="Product Image" 
+              loading="lazy">
           </a>
         </div>
         <div class="product__details__slider__content h-100">
           <div class="img h-100">
-            <img class="" src="{{ main_image }}" alt="Product Image">
+            <img 
+              src="{{ main_image }}" 
+              alt="Product Image" 
+              loading="lazy">
           </div>
         </div>
       </div>
@@ -129,7 +135,8 @@
             <img [src]="item.image" 
                  class="card-img-top position-relative border-bottom bg-body-secondary" 
                  alt="Product Image"
-                 (error)="handleImageError($event)">
+                 (error)="handleImageError($event)"
+                 loading="lazy">
           </div>
           
           <!-- Discount Badge -->

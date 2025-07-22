@@ -10,26 +10,30 @@ export class ProductService {
 
   constructor(private http: HttpClient) { }
 
-  getAllProducts(): Observable<any> {
-    return this.http.get(`${this.baseUrl}products?limit=100`).pipe(
+  getAllProducts(page = 1, limit = 20): Observable<any> {
+    const skip = (page - 1) * limit;
+    return this.http.get(`${this.baseUrl}products?limit=${limit}&skip=${skip}`).pipe(
       map((response: any) => ({
-        data: response.products || []
+        data: response.products || [],
+        total: response.total || 0
       })),
       catchError(error => {
-        console.error('Error fetching products:', error);
-        return of({ data: [] });
+        // console.error('Error fetching products:', error);
+        return of({ data: [], total: 0 });
       })
     );
   }
 
-  getProductsByCategory(category: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}products/category/${encodeURIComponent(category)}`).pipe(
+  getProductsByCategory(category: string, page = 1, limit = 20): Observable<any> {
+    const skip = (page - 1) * limit;
+    return this.http.get(`${this.baseUrl}products/category/${encodeURIComponent(category)}?limit=${limit}&skip=${skip}`).pipe(
       map((response: any) => ({
-        data: response.products || []
+        data: response.products || [],
+        total: response.total || 0
       })),
       catchError(error => {
-        console.error('Error fetching products by category:', error);
-        return of({ data: [] });
+        // console.error('Error fetching products by category:', error);
+        return of({ data: [], total: 0 });
       })
     );
   }
@@ -37,7 +41,7 @@ export class ProductService {
   getProductById(id: number): Observable<any> {
     return this.http.get(`${this.baseUrl}products/${id}`).pipe(
       catchError(error => {
-        console.error('Error fetching product by ID:', error);
+        // console.error('Error fetching product by ID:', error);
         throw error;
       })
     );
@@ -46,9 +50,9 @@ export class ProductService {
   getCategories(): Observable<any> {
     return this.http.get(`${this.baseUrl}products/categories`).pipe(
       map((response: any) => {
-        console.log('RAW RESPONSE:', response);
-        console.log('SAMPLE CATEGORY:', response[0]);
-        console.log('SAMPLE KEYS:', response[0] ? Object.keys(response[0]) : 'No keys');
+        // console.log('RAW RESPONSE:', response);
+        // console.log('SAMPLE CATEGORY:', response[0]);
+        // console.log('SAMPLE KEYS:', response[0] ? Object.keys(response[0]) : 'No keys');
         
         // Process response based on its structure
         let categories = [];
@@ -76,7 +80,7 @@ export class ProductService {
         return categories;
       }),
       catchError(error => {
-        console.error('ProductService - Error fetching categories:', error);
+        // console.error('ProductService - Error fetching categories:', error);
         // Return fallback categories
         return of([
           {name: 'Beauty', slug: 'beauty'},
